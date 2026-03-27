@@ -7,6 +7,8 @@ Sistema portable para secadas con:
 - registros por turno y secadora
 - edición y eliminación por administrador
 - gráficos locales sin dependencias externas
+- sincronización opcional con GitHub como nube
+- botón de WhatsApp para compartir avisos
 - exportación e importación JSON
 - exportación CSV
 
@@ -21,8 +23,14 @@ Sistema portable para secadas con:
 4. Crea usuarios, registra secadas y administra notificaciones.
 
 ## Portabilidad
-Todo queda guardado en el navegador del usuario y se puede exportar/importar en JSON para moverlo entre equipos.
+El sistema puede trabajar con sincronización en GitHub para conservar los datos fuera del navegador y también admite respaldo JSON como copia extra. El token de GitHub se captura solo en la sesión actual.
 
+## Mejoras previstas
+- Reforzar la autenticación con hash real y reglas de acceso más estrictas.
+- Validación extra al importar datos y al mover respaldos entre equipos.
+- Registro de auditoría más detallado para edición y eliminación.
+- Automatizar alertas y notificaciones por más canales operativos.
+- Mejorar la administración del token de GitHub para entornos compartidos.
 
 ## GitHub Pages
 1. Sube estos archivos al repositorio.
