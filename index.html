@@ -139,6 +139,29 @@
           </article>
         </div>
 
+        <div class="kpi-grid" style="margin-top:16px">
+          <article class="card mini-stat">
+            <span class="kpi-label">Secadas hoy</span>
+            <strong id="statToday" class="kpi-value">0</strong>
+            <span class="kpi-sub">Registros reales del día</span>
+          </article>
+          <article class="card mini-stat">
+            <span class="kpi-label">Secadas semana</span>
+            <strong id="statWeek" class="kpi-value">0</strong>
+            <span class="kpi-sub">Registros reales de la semana</span>
+          </article>
+          <article class="card mini-stat">
+            <span class="kpi-label">Secadas mes</span>
+            <strong id="statMonth" class="kpi-value">0</strong>
+            <span class="kpi-sub">Registros reales del mes</span>
+          </article>
+          <article class="card mini-stat">
+            <span class="kpi-label">Paros hoy</span>
+            <strong id="statStopsToday" class="kpi-value">0</strong>
+            <span class="kpi-sub">Secadoras sin registro</span>
+          </article>
+        </div>
+
         <div class="two-col">
           <section class="card">
             <div class="card-head">
@@ -211,8 +234,6 @@
                     <option value="1">Secadora 1</option>
                     <option value="2">Secadora 2</option>
                     <option value="3">Secadora 3</option>
-                    <option value="4">Secadora 4</option>
-                    <option value="5">Secadora 5</option>
                   </select>
                 </label>
                 <label class="field">
@@ -333,6 +354,43 @@
                 <tbody id="recordsBody"></tbody>
               </table>
             </div>
+          </section>
+        </div>
+
+        <div class="three-col" style="margin-top:16px">
+          <section class="card">
+            <div class="card-head">
+              <h3>Carga masiva desde Excel</h3>
+              <span class="pill">Pega tabulado</span>
+            </div>
+            <div class="record-form">
+              <label class="field">
+                <span>Pega aquí los datos</span>
+                <textarea id="bulkPasteInput" class="big-textarea" placeholder="Pega aquí las filas copiadas desde Excel o Google Sheets. La primera fila puede traer encabezados."></textarea>
+              </label>
+              <div class="row-actions">
+                <button id="bulkPreviewBtn" class="btn soft">Previsualizar</button>
+                <button id="bulkImportBtn" class="btn primary">Importar registros</button>
+                <button id="bulkClearBtn" class="btn ghost">Limpiar</button>
+              </div>
+              <div id="bulkImportInfo" class="empty">Listo para pegar datos.</div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Paros detectados</h3>
+              <span class="pill">Secadoras faltantes</span>
+            </div>
+            <div id="missingDryersList" class="stack"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Resumen rápido</h3>
+              <span class="pill">Real / paro</span>
+            </div>
+            <div id="quickPeriodStats" class="stack"></div>
           </section>
         </div>
       </section>
