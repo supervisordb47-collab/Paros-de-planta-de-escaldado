@@ -44,7 +44,7 @@
       "fullName": "Jose",
       "password": "jose",
       "role": "operador",
-      "active": true
+      "active": false
     }
   },
   "records": [
@@ -106,8 +106,8 @@
       "NIGHT": "empty_12"
     },
     "github": {
-      "sha": "8ae2dfb40bc63cb951332186a528b0f47beaa85f",
-      "syncedAt": "2026-03-27T22:04:12.473Z"
+      "sha": "9e416bf7e39238cbef99637b3687612561076fbf",
+      "syncedAt": "2026-03-27T22:06:45.304Z"
     }
   }
 }
