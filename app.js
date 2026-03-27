@@ -10,7 +10,7 @@
   function todayISO() { return new Date().toISOString().slice(0, 10); }
   function safe(v) { return String(v ?? '').trim(); }
   function upper(v) { return safe(v).toUpperCase(); }
-  function uid(prefix='id') {
+  function uid(prefix = 'id') {
     return `${prefix}_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
   }
   function fmtDate(iso) {
@@ -53,6 +53,21 @@
     return s === e || s === hashPassword(e);
   }
 
+  function normalizeUsers(users) {
+    const out = {};
+    Object.entries(users || {}).forEach(([key, user]) => {
+      if (!user) return;
+      const username = normalizeUser(user.username || key);
+      out[username] = {
+        ...user,
+        username,
+        role: user.role || 'operador',
+        active: user.active !== false
+      };
+    });
+    return out;
+  }
+
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -60,7 +75,7 @@
       const parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== 'object') return defaultState();
       parsed.settings = parsed.settings || defaultState().settings;
-      parsed.users = parsed.users || defaultState().users;
+      parsed.users = normalizeUsers(parsed.users || defaultState().users);
       parsed.records = Array.isArray(parsed.records) ? parsed.records : [];
       parsed.notifications = Array.isArray(parsed.notifications) ? parsed.notifications : [];
       parsed.meta = parsed.meta || defaultState().meta;
@@ -81,7 +96,8 @@
   let notificationTimer = null;
 
   function currentUser() {
-    return session?.username ? state.users[session.username] : null;
+    const username = session?.username ? normalizeUser(session.username) : null;
+    return username ? state.users[username] : null;
   }
   function isAdmin() {
     return currentUser()?.role === 'admin';
@@ -105,6 +121,7 @@
     try {
       const raw = localStorage.getItem(SESSION_KEY);
       session = raw ? JSON.parse(raw) : null;
+      if (session?.username) session.username = normalizeUser(session.username);
     } catch {
       session = null;
     }
@@ -126,16 +143,23 @@
   function login() {
     const username = normalizeUser($('loginUser').value);
     const pass = safe($('loginPass').value);
+
     if (!username || !pass) {
       showToast('Faltan datos', 'Escribe usuario y contraseña.');
       return;
     }
-    const user = state.users[username];
+
+    let user = state.users[username];
+    if (!user) {
+      user = Object.values(state.users).find(u => normalizeUser(u.username) === username);
+    }
+
     if (!user || !user.active || !verifyPassword(user.password, pass)) {
       showToast('Acceso denegado', 'Usuario o contraseña incorrectos.');
       return;
     }
-    session = { username };
+
+    session = { username: normalizeUser(user.username || username) };
     saveSession();
     $('loginPass').value = '';
     $('loginView').classList.add('hidden');
@@ -253,7 +277,7 @@
     const wrap = $('notifList');
     const feed = $('notificationFeed');
     const user = currentUser();
-    const list = state.notifications.slice().sort((a,b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    const list = state.notifications.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
 
     if (wrap) {
       wrap.innerHTML = list.length ? list.map(n => {
@@ -292,7 +316,7 @@
     const shifts = ['Día', 'Noche'];
 
     shifts.forEach(shift => {
-      const records = state.records.filter(r => r.shift === shift).sort((a,b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+      const records = state.records.filter(r => r.shift === shift).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
       const last = records[0];
       const metaKey = shift === 'Día' ? 'DAY' : 'NIGHT';
       let triggered = false;
@@ -404,7 +428,7 @@
       if (status === 'ok' && Number(r.secadas) <= 0) return false;
       if (status === 'stop' && Number(r.secadas) > 0) return false;
       return true;
-    }).sort((a,b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    }).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
   }
 
   function monthlySeries() {
@@ -458,7 +482,7 @@
         ...r,
         impact: toNumber(r.stopHours) || (Number(r.secadas) === 0 ? 1 : 0)
       }))
-      .sort((a,b) => b.impact - a.impact)
+      .sort((a, b) => b.impact - a.impact)
       .slice(0, 3);
 
     const box = $('topStops');
@@ -558,7 +582,7 @@
     if (!date) return 'Selecciona una fecha.';
     if (!shift) return 'Selecciona un turno.';
     if (!dryer) return 'Selecciona una secadora.';
-    if (!Number.isInteger(secadas) || secadas < 0) return 'Secadas debe ser un número entero mayor o igual a 0.';
+    if (!Number.isInteger(secadas) || secadas < 0) return 'Secadas debe ser un número entero mayor o igual a 0';
 
     if (secadas > 0) {
       const h = $('durationHours').value;
@@ -837,7 +861,7 @@
     const csvRows = [headers].concat(rows.map(r => ([
       r.user, r.fullName || '', r.date, r.shift, r.dryer, r.secadas,
       recordDurationText(r), r.stopHours || '', summarizeCause(r.mainStop || r.stopType, r.secadas), r.mainStop || '', r.notes || '', r.createdAt || ''
-    ]))).map(arr => arr.map(v => `"${String(v ?? '').replaceAll('"','""')}"`).join(',')).join('\n');
+    ]))).map(arr => arr.map(v => `"${String(v ?? '').replaceAll('"', '""')}"`).join(',')).join('\n');
 
     const blob = new Blob([csvRows], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -855,9 +879,11 @@
         const imported = JSON.parse(reader.result);
         if (!imported || typeof imported !== 'object') throw new Error('JSON inválido');
         if (!imported.settings || !imported.users || !Array.isArray(imported.records)) throw new Error('Faltan campos base');
+
         state = {
           ...clone(defaultState()),
           ...imported,
+          users: normalizeUsers(imported.users),
           meta: imported.meta || clone(defaultState().meta)
         };
         saveState();
@@ -915,10 +941,10 @@
     const height = Math.max(220, rect.height || canvas.height || 280);
     canvas.width = width * ratio;
     canvas.height = height * ratio;
-    ctx.setTransform(ratio,0,0,ratio,0,0);
-    ctx.clearRect(0,0,width,height);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,width,height);
+    ctx.fillRect(0, 0, width, height);
 
     const pad = { l: 44, r: 20, t: 16, b: 52 };
     const chartW = width - pad.l - pad.r;
@@ -966,10 +992,10 @@
     const height = Math.max(220, rect.height || canvas.height || 280);
     canvas.width = width * ratio;
     canvas.height = height * ratio;
-    ctx.setTransform(ratio,0,0,ratio,0,0);
-    ctx.clearRect(0,0,width,height);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,width,height);
+    ctx.fillRect(0, 0, width, height);
 
     const pad = { l: 44, r: 20, t: 18, b: 44 };
     const chartW = width - pad.l - pad.r;
@@ -1000,7 +1026,7 @@
       const x = pad.l + (chartW / Math.max(1, values.length - 1)) * i;
       const y = pad.t + chartH - (v / max) * chartH;
       ctx.fillStyle = color;
-      ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI * 2); ctx.fill();
       if (i % 2 === 0 || i === values.length - 1) {
         ctx.fillStyle = '#5e6f84';
         ctx.font = '12px sans-serif';
@@ -1022,13 +1048,13 @@
       const height = Math.max(220, rect.height || canvas.height || 280);
       canvas.width = width * ratio;
       canvas.height = height * ratio;
-      ctx.setTransform(ratio,0,0,ratio,0,0);
-      ctx.clearRect(0,0,width,height);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = '#fff';
-      ctx.fillRect(0,0,width,height);
+      ctx.fillRect(0, 0, width, height);
       ctx.fillStyle = '#6d7f95';
       ctx.font = '14px sans-serif';
-      ctx.fillText('Sin datos todavía', width/2 - 50, height/2);
+      ctx.fillText('Sin datos todavía', width / 2 - 50, height / 2);
       return;
     }
     drawBarChart(canvas, series.labels.slice(-8), series.values.slice(-8), ['#2563eb', '#14b8a6', '#f59e0b', '#8b5cf6']);
@@ -1152,12 +1178,12 @@
       showToast('Alertas revisadas', 'Se validó el tiempo sin registros.');
     });
 
-    ['recordDate','recordShift','recordDryer','recordSecadas','durationHours','durationMinutes','stopHours','stopType','mainStop','recordNotes'].forEach(id => {
+    ['recordDate', 'recordShift', 'recordDryer', 'recordSecadas', 'durationHours', 'durationMinutes', 'stopHours', 'stopType', 'mainStop', 'recordNotes'].forEach(id => {
       $(id).addEventListener('input', syncRecordFields);
       $(id).addEventListener('change', syncRecordFields);
     });
 
-    ['searchRecords','filterDate','filterShift','filterUser','filterStatus'].forEach(id => {
+    ['searchRecords', 'filterDate', 'filterShift', 'filterUser', 'filterStatus'].forEach(id => {
       $(id).addEventListener('input', renderRecordsTable);
       $(id).addEventListener('change', renderRecordsTable);
     });
@@ -1214,7 +1240,6 @@
     }, 15000);
   }
 
-  // Expose minimal globals for inline use if needed.
   window.__portal = {
     login,
     logout,
