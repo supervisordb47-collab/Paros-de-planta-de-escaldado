@@ -49,6 +49,23 @@
   },
   "records": [
     {
+      "id": "rec_cbofhkwj88uz",
+      "user": "ADMIN",
+      "fullName": "Administrador",
+      "date": "2026-03-23",
+      "shift": "Día",
+      "dryer": "2",
+      "secadas": 1,
+      "durationHours": "06",
+      "durationMinutes": "45",
+      "stopHours": 0,
+      "stopType": "",
+      "mainStop": "",
+      "notes": "",
+      "createdAt": "2026-03-27T23:00:17.243Z",
+      "updatedAt": "2026-03-27T23:00:17.243Z"
+    },
+    {
       "id": "rec_h74drqka5fye",
       "user": "ADMIN",
       "fullName": "Administrador",
@@ -204,6 +221,16 @@
   ],
   "notifications": [
     {
+      "id": "notif_epkxfanb88uz",
+      "title": "Nuevo registro",
+      "message": "Administrador registró 1 secadas en turno Día (2026-03-23).",
+      "type": "success",
+      "scope": "record",
+      "createdAt": "2026-03-27T23:00:17.243Z",
+      "readBy": [],
+      "source": "system"
+    },
+    {
       "id": "notif_kreubt6w5fye",
       "title": "Paro registrado",
       "message": "Administrador registró un paro principal en turno Noche (2026-03-23).",
@@ -344,8 +371,8 @@
       "NIGHT": null
     },
     "github": {
-      "sha": "8d5a004c4eef6ed8edc2418339c62243608d5852",
-      "syncedAt": "2026-03-27T22:57:58.497Z"
+      "sha": "3add7c2094a884c1b4efcb8f8079056e1ea137e0",
+      "syncedAt": "2026-03-27T22:58:58.972Z"
     }
   }
 }
