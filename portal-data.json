@@ -14,7 +14,7 @@
       "branch": "main",
       "path": "portal-data.json"
     },
-    "whatsappNumber": "+50495868906",
+    "whatsappNumber": "",
     "whatsappMessage": "Hola, comparto el estado del portal de secadas."
   },
   "users": {
@@ -50,22 +50,22 @@
   "records": [],
   "notifications": [
     {
-      "id": "notif_xqpbczxpf5k0",
+      "id": "notif_x8azd5xtiy5l",
       "title": "Sin ingreso en turno Noche",
       "message": "No existe ningún registro aún para el turno Noche.",
       "type": "warning",
       "scope": "shift",
-      "createdAt": "2026-03-27T20:45:41.472Z",
+      "createdAt": "2026-03-27T20:48:38.505Z",
       "readBy": [],
       "source": "system"
     },
     {
-      "id": "notif_5zhh8m2of5jq",
+      "id": "notif_upbo2suliy5l",
       "title": "Sin ingreso en turno Día",
       "message": "No existe ningún registro aún para el turno Día.",
       "type": "warning",
       "scope": "shift",
-      "createdAt": "2026-03-27T20:45:41.462Z",
+      "createdAt": "2026-03-27T20:48:38.505Z",
       "readBy": [],
       "source": "system"
     }
@@ -74,10 +74,6 @@
     "notificationState": {
       "DAY": "empty_12",
       "NIGHT": "empty_12"
-    },
-    "github": {
-      "sha": "1ef8adabfbc2fda07f3c1fa7eaa5508390e62cbd",
-      "syncedAt": "2026-03-27T20:47:22.443Z"
     }
   }
 }
