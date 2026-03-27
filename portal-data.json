@@ -49,6 +49,23 @@
   },
   "records": [
     {
+      "id": "rec_8kqtqth3ae5i",
+      "user": "ADMIN",
+      "fullName": "Administrador",
+      "date": "2026-03-24",
+      "shift": "Noche",
+      "dryer": "3",
+      "secadas": 1,
+      "durationHours": "07",
+      "durationMinutes": "00",
+      "stopHours": 0,
+      "stopType": "",
+      "mainStop": "",
+      "notes": "",
+      "createdAt": "2026-03-27T23:01:57.414Z",
+      "updatedAt": "2026-03-27T23:01:57.414Z"
+    },
+    {
       "id": "rec_m50qly64a1ep",
       "user": "ADMIN",
       "fullName": "Administrador",
@@ -238,6 +255,16 @@
   ],
   "notifications": [
     {
+      "id": "notif_merlthixae5i",
+      "title": "Nuevo registro",
+      "message": "Administrador registró 1 secadas en turno Noche (2026-03-24).",
+      "type": "success",
+      "scope": "record",
+      "createdAt": "2026-03-27T23:01:57.414Z",
+      "readBy": [],
+      "source": "system"
+    },
+    {
       "id": "notif_vrlz233ua1ep",
       "title": "Nuevo registro",
       "message": "Administrador registró 1 secadas en turno Noche (2026-03-24).",
@@ -398,8 +425,8 @@
       "NIGHT": null
     },
     "github": {
-      "sha": "f4193cd32be89f3bbcbd0452772f48ac751ced81",
-      "syncedAt": "2026-03-27T23:01:00.953Z"
+      "sha": "882451fd38d502872df68165d7d5c8a6a1c6fb5c",
+      "syncedAt": "2026-03-27T23:01:42.553Z"
     }
   }
 }
