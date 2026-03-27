@@ -13,7 +13,7 @@ const PORTAL_DEFAULT_DATA = {
       owner: '',
       repo: '',
       branch: 'main',
-      path: 'portal-state.json'
+      path: 'portal-data.json'
     },
     whatsappNumber: '',
     whatsappMessage: 'Hola, comparto el estado del portal de secadas.'
