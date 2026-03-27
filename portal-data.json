@@ -49,6 +49,23 @@
   },
   "records": [
     {
+      "id": "rec_h74drqka5fye",
+      "user": "ADMIN",
+      "fullName": "Administrador",
+      "date": "2026-03-23",
+      "shift": "Noche",
+      "dryer": "3",
+      "secadas": 0,
+      "durationHours": null,
+      "durationMinutes": null,
+      "stopHours": 12,
+      "stopType": "carga",
+      "mainStop": "Falta de carga por falta de materia prima leitada; no se contaba con granza mojada.",
+      "notes": "",
+      "createdAt": "2026-03-27T22:58:06.470Z",
+      "updatedAt": "2026-03-27T22:58:06.470Z"
+    },
+    {
       "id": "rec_dwh87ktl4aer",
       "user": "ADMIN",
       "fullName": "Administrador",
@@ -187,6 +204,16 @@
   ],
   "notifications": [
     {
+      "id": "notif_kreubt6w5fye",
+      "title": "Paro registrado",
+      "message": "Administrador registró un paro principal en turno Noche (2026-03-23).",
+      "type": "danger",
+      "scope": "record",
+      "createdAt": "2026-03-27T22:58:06.470Z",
+      "readBy": [],
+      "source": "system"
+    },
+    {
       "id": "notif_yg4qnux74aer",
       "title": "Nuevo registro",
       "message": "Administrador registró 1 secadas en turno Noche (2026-03-23).",
@@ -317,8 +344,8 @@
       "NIGHT": null
     },
     "github": {
-      "sha": "8c5c8c269cbba197b9dd960bc1e4de454163613c",
-      "syncedAt": "2026-03-27T22:56:58.711Z"
+      "sha": "8d5a004c4eef6ed8edc2418339c62243608d5852",
+      "syncedAt": "2026-03-27T22:57:58.497Z"
     }
   }
 }
