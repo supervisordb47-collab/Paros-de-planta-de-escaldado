@@ -9,8 +9,20 @@ const PORTAL_DEFAULT_DATA = {
     theme: 'blue'
   },
   users: {
-    Admin: { username: 'ADMIN', fullName: 'Administrador', password: 'admin123', role: 'admin', active: true },
-    Selvin: { username: 'Operador', fullName: 'Selvin Ariel Reaños Figueroa', password: 'figueroa', role: 'operador', active: true }
+    ADMIN: {
+      username: 'ADMIN',
+      fullName: 'Administrador',
+      password: 'admin123',
+      role: 'admin',
+      active: true
+    },
+    SELVIN: {
+      username: 'SELVIN',
+      fullName: 'Selvin Ariel Reaños Figueroa',
+      password: 'figueroa',
+      role: 'operador',
+      active: true
+    }
   },
   records: [],
   notifications: [],
