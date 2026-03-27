@@ -7,7 +7,16 @@ const PORTAL_DEFAULT_DATA = {
     monthlyTarget: 180,
     alertHours: 12,
     totalDryers: 3,
-    theme: 'blue'
+    theme: 'blue',
+    githubSync: {
+      enabled: false,
+      owner: '',
+      repo: '',
+      branch: 'main',
+      path: 'portal-state.json'
+    },
+    whatsappNumber: '',
+    whatsappMessage: 'Hola, comparto el estado del portal de secadas.'
   },
   users: {
     ADMIN: {
