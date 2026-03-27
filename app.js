@@ -525,9 +525,7 @@
   }
 
   function getRecordsVisible() {
-    if (isAdmin()) return state.records.slice();
-    const u = currentUser();
-    return u ? state.records.filter(r => r.user === u.username) : [];
+    return state.records.slice();
   }
 
   function recordSummary() {
