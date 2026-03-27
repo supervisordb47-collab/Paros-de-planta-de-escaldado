@@ -1,7 +1,7 @@
 (() => {
   const SESSION_KEY = 'secadas_portal_session_v1';
   const GITHUB_TOKEN_KEY = 'secadas_portal_github_token_v1';
-  const DEFAULT_GITHUB_FILE = 'portal-state.json';
+  const DEFAULT_GITHUB_FILE = 'portal-data.json';
 
   const $ = (id) => document.getElementById(id);
 
@@ -383,24 +383,73 @@
     }
   }
 
+  function applyRemoteState(remote) {
+    state = {
+      ...clone(defaultState()),
+      ...remote,
+      settings: mergeSettings(defaultState().settings, remote.settings || {}),
+      users: normalizeUsers(remote.users || defaultState().users),
+      records: Array.isArray(remote.records) ? remote.records : [],
+      notifications: Array.isArray(remote.notifications) ? remote.notifications : [],
+      meta: remote.meta || clone(defaultState().meta)
+    };
+    state.meta.github = remote.meta?.github || state.meta.github || null;
+  }
+
+  async function refreshStateFromGitHub({ force = false, silent = false } = {}) {
+    if (!isGitHubConfigured()) return false;
+    if (syncInFlight) return false;
+    try {
+      const remote = await readStateFromGitHub();
+      if (!remote) {
+        if (!silent) {
+          const cfgReady = isGitHubConfigured();
+          updateSyncBadge(isGitHubSyncReady() ? 'Pendiente de sync' : (cfgReady ? 'Falta token' : 'Sin conexión'), cfgReady ? (isGitHubSyncReady() ? 'GitHub' : 'agrega token') : 'configurar GitHub');
+        }
+        return false;
+      }
+      const remoteSha = remote?.meta?.github?.sha || null;
+      const localSha = state?.meta?.github?.sha || null;
+      if (!force && remoteSha && localSha && remoteSha === localSha) {
+        if (!silent) updateSyncBadge('Sincronizado', githubConfig().branch || 'main');
+        return false;
+      }
+      if (editingRecordId && !force) {
+        if (!silent) showToast('Hay un registro en edición', 'Termina o guarda la edición antes de recargar desde GitHub.');
+        return false;
+      }
+      applyRemoteState(remote);
+      if (!silent) updateSyncBadge('Sincronizado', githubConfig().branch || 'main');
+      renderAll();
+      return true;
+    } catch (err) {
+      lastSyncError = err?.message || 'Error al leer GitHub';
+      if (!silent) updateSyncBadge('Sin conexión', 'revisar GitHub');
+      return false;
+    }
+  }
+
+  async function syncNow() {
+    const ok = await persistStateToGitHub();
+    if (!ok) {
+      showToast('No se pudo sincronizar', lastSyncError || 'Revisa GitHub.');
+      return false;
+    }
+    await refreshStateFromGitHub({ force: true, silent: true }).catch(() => {});
+    renderAll();
+    showToast('Sincronizado', 'La nube quedó actualizada.');
+    return true;
+  }
+
   async function initializeState() {
     state = loadState();
     const remote = await readStateFromGitHub().catch(() => null);
     if (remote && typeof remote === 'object') {
-      state = {
-        ...clone(defaultState()),
-        ...remote,
-        settings: mergeSettings(defaultState().settings, remote.settings || {}),
-        users: normalizeUsers(remote.users || defaultState().users),
-        records: Array.isArray(remote.records) ? remote.records : [],
-        notifications: Array.isArray(remote.notifications) ? remote.notifications : [],
-        meta: remote.meta || clone(defaultState().meta)
-      };
-      state.meta.github = remote.meta?.github || state.meta.github || null;
+      applyRemoteState(remote);
       updateSyncBadge('Sincronizado', githubConfig().branch || 'main');
     } else {
       const cfgReady = isGitHubConfigured();
-    updateSyncBadge(isGitHubSyncReady() ? 'Pendiente de sync' : (cfgReady ? 'Falta token' : 'Sin conexión'), cfgReady ? (isGitHubSyncReady() ? 'GitHub' : 'agrega token') : 'configurar GitHub');
+      updateSyncBadge(isGitHubSyncReady() ? 'Pendiente de sync' : (cfgReady ? 'Falta token' : 'Sin conexión'), cfgReady ? (isGitHubSyncReady() ? 'GitHub' : 'agrega token') : 'configurar GitHub');
     }
   }
 
@@ -1803,6 +1852,16 @@
         renderCharts();
       }
     }, 15000);
+    setInterval(() => {
+      if (session && isGitHubConfigured()) {
+        refreshStateFromGitHub({ silent: true }).catch(() => {});
+      }
+    }, 30000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && session && isGitHubConfigured()) {
+        refreshStateFromGitHub({ silent: true }).catch(() => {});
+      }
+    });
   }
 
   window.__portal = {
