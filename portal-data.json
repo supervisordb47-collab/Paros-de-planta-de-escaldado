@@ -134,23 +134,6 @@
       "updatedAt": "2026-03-27T22:50:31.651Z"
     },
     {
-      "id": "rec_1rqhbu3wmku6",
-      "user": "SELVIN",
-      "fullName": "Selvin Ariel Reaños Figueroa",
-      "date": "2026-03-27",
-      "shift": "Día",
-      "dryer": "2",
-      "secadas": 1,
-      "durationHours": "06",
-      "durationMinutes": "15",
-      "stopHours": 0,
-      "stopType": "",
-      "mainStop": "",
-      "notes": "",
-      "createdAt": "2026-03-27T22:43:26.334Z",
-      "updatedAt": "2026-03-27T22:43:26.334Z"
-    },
-    {
       "id": "rec_4lbe3hhh9vak",
       "user": "ADMIN",
       "fullName": "Administrador",
@@ -169,6 +152,16 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif_1bfl8zna04lc",
+      "title": "Registro eliminado",
+      "message": "Se eliminó un registro del turno Día.",
+      "type": "danger",
+      "scope": "record",
+      "createdAt": "2026-03-27T22:53:58.464Z",
+      "readBy": [],
+      "source": "system"
+    },
     {
       "id": "notif_dbc37okfy3ed",
       "title": "Paro registrado",
@@ -265,11 +258,11 @@
   "meta": {
     "notificationState": {
       "DAY": null,
-      "NIGHT": "empty_12"
+      "NIGHT": null
     },
     "github": {
-      "sha": "430391f27fe50d363ccee523c4a1e9374e7c099a",
-      "syncedAt": "2026-03-27T22:52:05.370Z"
+      "sha": "ee48b05164cf7bb1715eb5fbeecf841ecad2239b",
+      "syncedAt": "2026-03-27T22:52:58.674Z"
     }
   }
 }
