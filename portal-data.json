@@ -1,30 +1,79 @@
-```json id="uh2c84"
 {
   "settings": {
-    "portalName": "Portal de Secadas",
-    "tagline": "Monitoreo operativo en tiempo real",
-    "dailyGoal": 20,
-    "monthlyGoal": 600,
-    "inactivityHours": 4,
-    "theme": "dark"
+    "portalName": "Portal Secadas",
+    "portalTagline": "Operación, turnos y trazabilidad",
+    "dailyTarget": 6,
+    "monthlyTarget": 180,
+    "alertHours": 12,
+    "totalDryers": 3,
+    "theme": "blue",
+    "githubSync": {
+      "enabled": true,
+      "owner": "supervisordb47-collab",
+      "repo": "Paros-de-planta-de-escaldado",
+      "branch": "main",
+      "path": "portal-data.json"
+    },
+    "whatsappNumber": "",
+    "whatsappMessage": "Hola, comparto el estado del portal de secadas."
   },
-  "users": [
-    {
-      "id": "u-admin",
-      "username": "admin",
+  "users": {
+    "ADMIN": {
+      "username": "ADMIN",
       "fullName": "Administrador",
-      "password": "1234",
+      "password": "admin123",
       "role": "admin",
       "active": true
+    },
+    "SELVIN": {
+      "username": "SELVIN",
+      "fullName": "Selvin Ariel Reaños Figueroa",
+      "password": "figueroa",
+      "role": "operador",
+      "active": true
+    },
+    "GADIEL": {
+      "username": "GADIEL",
+      "fullName": "Gadiel",
+      "password": "gadiel",
+      "role": "operador",
+      "active": true
+    },
+    "JOSE": {
+      "username": "JOSE",
+      "fullName": "Jose",
+      "password": "jose",
+      "role": "operador",
+      "active": true
+    }
+  },
+  "records": [],
+  "notifications": [
+    {
+      "id": "notif_xqpbczxpf5k0",
+      "title": "Sin ingreso en turno Noche",
+      "message": "No existe ningún registro aún para el turno Noche.",
+      "type": "warning",
+      "scope": "shift",
+      "createdAt": "2026-03-27T20:45:41.472Z",
+      "readBy": [],
+      "source": "system"
+    },
+    {
+      "id": "notif_5zhh8m2of5jq",
+      "title": "Sin ingreso en turno Día",
+      "message": "No existe ningún registro aún para el turno Día.",
+      "type": "warning",
+      "scope": "shift",
+      "createdAt": "2026-03-27T20:45:41.462Z",
+      "readBy": [],
+      "source": "system"
     }
   ],
-  "records": [],
-  "notifications": [],
   "meta": {
     "notificationState": {
-      "day": null,
-      "night": null
+      "DAY": "empty_12",
+      "NIGHT": "empty_12"
     }
   }
 }
-```
