@@ -74,7 +74,9 @@
       "type": "danger",
       "scope": "record",
       "createdAt": "2026-03-27T21:09:34.508Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -100,12 +102,12 @@
   ],
   "meta": {
     "notificationState": {
-      "DAY": "empty_12",
+      "DAY": null,
       "NIGHT": "empty_12"
     },
     "github": {
-      "sha": null,
-      "syncedAt": "2026-03-27T21:16:29.966Z"
+      "sha": "8b49915f8e126a8aaacf35ee490b92735e17b0a8",
+      "syncedAt": "2026-03-27T21:18:32.139Z"
     }
   }
 }
