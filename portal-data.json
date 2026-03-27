@@ -37,7 +37,7 @@
       "fullName": "Gadiel",
       "password": "gadiel",
       "role": "operador",
-      "active": true
+      "active": false
     },
     "JOSE": {
       "username": "JOSE",
@@ -106,8 +106,8 @@
       "NIGHT": "empty_12"
     },
     "github": {
-      "sha": null,
-      "syncedAt": "2026-03-27T22:02:41.839Z"
+      "sha": "8ae2dfb40bc63cb951332186a528b0f47beaa85f",
+      "syncedAt": "2026-03-27T22:04:12.473Z"
     }
   }
 }
