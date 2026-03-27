@@ -6,6 +6,7 @@ const PORTAL_DEFAULT_DATA = {
     dailyTarget: 6,
     monthlyTarget: 180,
     alertHours: 12,
+    totalDryers: 3,
     theme: 'blue'
   },
   users: {
@@ -20,6 +21,20 @@ const PORTAL_DEFAULT_DATA = {
       username: 'SELVIN',
       fullName: 'Selvin Ariel Reaños Figueroa',
       password: 'figueroa',
+      role: 'operador',
+      active: true
+    },
+    GADIEL: {
+      username: 'GADIEL',
+      fullName: 'Gadiel',
+      password: 'gadiel',
+      role: 'operador',
+      active: true
+    },
+    JOSE: {
+      username: 'JOSE',
+      fullName: 'Jose',
+      password: 'jose',
       role: 'operador',
       active: true
     }
