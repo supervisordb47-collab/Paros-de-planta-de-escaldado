@@ -39,6 +39,70 @@
     const n = Number(v);
     return Number.isFinite(n) ? n : fallback;
   }
+
+  function parseDateTimeFromParts(datePart, timePart) {
+    const d = safe(datePart);
+    const t = safe(timePart);
+    if (!d && !t) return null;
+    if (d && d.includes('T')) {
+      const dt = new Date(d);
+      return Number.isNaN(dt.getTime()) ? null : dt.toISOString();
+    }
+    const isoDateMatch = /^\d{4}-\d{2}-\d{2}$/.test(d);
+    const dmyMatch = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/.exec(d);
+    let dateISO = '';
+    if (isoDateMatch) {
+      dateISO = d;
+    } else if (dmyMatch) {
+      const [, dd, mm, yyyy] = dmyMatch;
+      dateISO = `${yyyy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+    }
+    const timeISO = t ? t.split(':').slice(0, 3).map((x, i) => i === 0 || i === 1 || i === 2 ? String(x).padStart(2, '0') : x).join(':') : '00:00:00';
+    if (!dateISO) return null;
+    const dt = new Date(`${dateISO}T${timeISO.length === 5 ? `${timeISO}:00` : timeISO}`);
+    return Number.isNaN(dt.getTime()) ? null : dt.toISOString();
+  }
+
+  function isoToDateKey(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toISOString().slice(0, 10);
+  }
+
+  function weekStartKey(dateStr = todayISO()) {
+    const d = new Date(`${dateStr}T00:00:00`);
+    if (Number.isNaN(d.getTime())) return dateStr;
+    const day = (d.getDay() + 6) % 7; // Monday = 0
+    d.setDate(d.getDate() - day);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function inRange(dateStr, startKey, endKey) {
+    return !!dateStr && dateStr >= startKey && dateStr <= endKey;
+  }
+
+  function normalizeHeader(textValue) {
+    return safe(textValue)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  }
+
+  function splitPasteRow(line) {
+    const raw = safe(line);
+    if (!raw) return [];
+    if (raw.includes('\t')) return raw.split('\t').map(safe);
+    return raw.split(/\s{2,}/).map(safe);
+  }
+
+  function parseIntMaybe(v) {
+    const n = parseInt(String(v).replace(/[^\d-]/g, ''), 10);
+    return Number.isFinite(n) ? n : null;
+  }
+
   function normalizeUser(v) { return upper(v); }
   function hashPassword(pass) {
     try {
@@ -74,7 +138,7 @@
       if (!raw) return defaultState();
       const parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== 'object') return defaultState();
-      parsed.settings = parsed.settings || defaultState().settings;
+      parsed.settings = { ...defaultState().settings, ...(parsed.settings || {}) };
       parsed.users = normalizeUsers(parsed.users || defaultState().users);
       parsed.records = Array.isArray(parsed.records) ? parsed.records : [];
       parsed.notifications = Array.isArray(parsed.notifications) ? parsed.notifications : [];
@@ -223,6 +287,256 @@
     const last = recs.slice().sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))[0];
     const compliance = clamp((monthTotal / (Number(state.settings.monthlyTarget) || 1)) * 100, 0, 999);
     return { total, monthTotal, shiftTotals, bestShift, last, compliance };
+  }
+
+  function dryerCount() {
+    return Math.max(1, parseIntMaybe(state.settings.totalDryers) || 3);
+  }
+
+  function completedRecords(records = getRecordsVisible()) {
+    return records.filter(r => toNumber(r.secadas) > 0);
+  }
+
+  function todayWeekMonthStats(records = getRecordsVisible()) {
+    const completed = completedRecords(records);
+    const today = todayISO();
+    const weekStart = weekStartKey(today);
+    const weekEnd = (() => {
+      const d = new Date(`${weekStart}T00:00:00`);
+      d.setDate(d.getDate() + 6);
+      return d.toISOString().slice(0, 10);
+    })();
+    const month = today.slice(0, 7);
+    const isInWeek = (dateKey) => !!dateKey && inRange(dateKey, weekStart, weekEnd);
+    return {
+      today: sum(completed.filter(r => (r.date || '').slice(0, 10) === today).map(r => toNumber(r.secadas))),
+      week: sum(completed.filter(r => isInWeek((r.date || '').slice(0, 10))).map(r => toNumber(r.secadas))),
+      month: sum(completed.filter(r => (r.date || '').slice(0, 7) === month).map(r => toNumber(r.secadas)))
+    };
+  }
+
+  function buildMissingDryerList(records = getRecordsVisible()) {
+    const total = dryerCount();
+    const map = new Map();
+    records.forEach(r => {
+      const dateKey = (r.date || '').slice(0, 10);
+      if (!dateKey) return;
+      if (!map.has(dateKey)) map.set(dateKey, new Set());
+      map.get(dateKey).add(String(r.dryer));
+    });
+
+    return [...map.entries()]
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .flatMap(([dateKey, set]) => {
+        const missing = [];
+        for (let i = 1; i <= total; i++) {
+          if (!set.has(String(i))) missing.push(i);
+        }
+        return missing.map(dryer => ({
+          dateKey,
+          dryer,
+          present: [...set].map(Number).filter(Number.isFinite).sort((a, b) => a - b),
+          total
+        }));
+      })
+      .slice(0, 12);
+  }
+
+  function openParoDraft(dateKey, dryer) {
+    const viewBtn = document.querySelector('[data-view="recordsView"]');
+    if (viewBtn) viewBtn.click();
+    $('recordDate').value = dateKey || todayISO();
+    $('recordShift').value = 'Día';
+    $('recordDryer').value = String(dryer || 1);
+    $('recordSecadas').value = '0';
+    $('stopHours').value = '0';
+    $('stopType').value = 'programado';
+    $('mainStop').value = `Secadora ${dryer} sin secadas registradas para ${fmtDateOnly(dateKey)}.`;
+    $('recordNotes').value = 'Paro sugerido automáticamente por ausencia de registro.';
+    syncRecordFields();
+    showToast('Paro preparado', `Ya quedó listo el registro del paro de la secadora ${dryer}.`);
+  }
+
+  function renderPeriodStats() {
+    const stats = todayWeekMonthStats();
+    const missing = buildMissingDryerList();
+    const todayStops = missing.filter(x => x.dateKey === todayISO()).length;
+    const setText = (id, value) => {
+      const el = $(id);
+      if (el) el.textContent = String(value);
+    };
+    setText('statToday', stats.today);
+    setText('statWeek', stats.week);
+    setText('statMonth', stats.month);
+    setText('statStopsToday', todayStops);
+
+    const box = $('quickPeriodStats');
+    if (box) {
+      const monthTarget = Number(state.settings.monthlyTarget) || 180;
+      box.innerHTML = `
+        <div class="period-stat"><span>Hoy</span><strong>${stats.today}</strong><span>Secadas reales registradas</span></div>
+        <div class="period-stat"><span>Semana</span><strong>${stats.week}</strong><span>Secadas reales registradas</span></div>
+        <div class="period-stat"><span>Mes</span><strong>${stats.month}</strong><span>Secadas reales registradas</span></div>
+        <div class="period-stat"><span>Meta mensual</span><strong>${monthTarget}</strong><span>Objetivo configurado</span></div>
+      `;
+    }
+
+    const list = $('missingDryersList');
+    if (list) {
+      if (!missing.length) {
+        list.innerHTML = `<div class="empty">No hay secadoras faltantes en los días con registros.</div>`;
+      } else {
+        list.innerHTML = missing.map(item => `
+          <div class="missing-dryer">
+            <div class="user-top">
+              <div>
+                <div class="stop-title">${escapeHtml(fmtDateOnly(item.dateKey))}</div>
+                <div class="stop-meta">Falta secadora ${escapeHtml(String(item.dryer))} · Presentes: ${escapeHtml(item.present.join(', ') || '—')}</div>
+              </div>
+              <span class="tag">Paro sugerido</span>
+            </div>
+            <div class="row-actions">
+              <button class="small-btn danger" data-paro-date="${escapeHtml(item.dateKey)}" data-paro-dryer="${escapeHtml(String(item.dryer))}">Registrar paro</button>
+            </div>
+          </div>
+        `).join('');
+        list.querySelectorAll('[data-paro-date]').forEach(btn => {
+          btn.addEventListener('click', () => openParoDraft(btn.dataset.paroDate, btn.dataset.paroDryer));
+        });
+      }
+    }
+  }
+
+  function normalizeBulkHeaders(row) {
+    return row.map(v => normalizeHeader(v));
+  }
+
+  function parseBulkRows(text) {
+    const lines = safe(text).split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return { rows: [], imported: [], warnings: ['No hay datos para importar.'] };
+
+    const firstCells = splitPasteRow(lines[0]);
+    const normalizedFirst = normalizeBulkHeaders(firstCells);
+    const hasHeader = normalizedFirst.some(h => h.includes('fecha y hora') || h.includes('secadora') || h.includes('rendimiento') || h.includes('usuario'));
+
+    const dataLines = hasHeader ? lines.slice(1) : lines;
+    const rows = [];
+
+    dataLines.forEach((line, index) => {
+      const cells = splitPasteRow(line);
+      if (!cells.length) return;
+      const row = (i) => safe(cells[i]);
+
+      const createdAt = parseDateTimeFromParts(row(0).split(' ')[0], row(0).split(' ').slice(1).join(' ')) || nowISO();
+      const loadAt = parseDateTimeFromParts(row(3), row(4)) || createdAt;
+      const unloadAt = parseDateTimeFromParts(row(8), row(9));
+      const completed = Boolean(safe(row(8)) || safe(row(9)) || safe(row(10)) || safe(row(11)) || safe(row(12)) || safe(row(14)) || safe(row(15)));
+      const dateKey = (row(3) || isoToDateKey(loadAt) || createdAt.slice(0, 10)).slice(0, 10);
+      const dryer = parseIntMaybe(row(1)) || 1;
+      const importedUser = normalizeUser(row(16) || currentUser()?.username || 'ADMIN');
+      const user = state.users[importedUser] ? importedUser : (currentUser()?.username || 'ADMIN');
+      const fullName = state.users[user]?.fullName || row(16) || user;
+      const performanceHead = safe(row(14));
+      const performanceRaw = safe(row(15));
+      const sourceNotes = [
+        `Carga masiva`,
+        `Silo remojo: ${row(2) || '—'}`,
+        `Humedad entrada: ${row(5) || '—'}`,
+        `Temp entrada: ${row(6) || '—'}`,
+        `Responsable carga: ${row(7) || '—'}`,
+        `Humedad salida: ${row(10) || '—'}`,
+        `Temp salida: ${row(11) || '—'}`,
+        `Silo descarga: ${row(12) || '—'}`,
+        `Responsable descarga: ${row(13) || '—'}`,
+        `Entero: ${performanceHead || '—'}`,
+        `Materia prima: ${performanceRaw || '—'}`
+      ].join(' · ');
+
+      rows.push({
+        id: uid('rec'),
+        user,
+        fullName,
+        date: dateKey,
+        shift: loadAt ? (new Date(loadAt).getHours() >= 6 && new Date(loadAt).getHours() < 18 ? 'Día' : 'Noche') : 'Día',
+        dryer: String(dryer),
+        secadas: completed ? 1 : 0,
+        durationHours: completed && unloadAt ? Math.max(0, Math.round((new Date(unloadAt).getTime() - new Date(loadAt).getTime()) / 3600000)) : null,
+        durationMinutes: completed && unloadAt ? String(Math.max(0, Math.round(((new Date(unloadAt).getTime() - new Date(loadAt).getTime()) % 3600000) / 60000))).padStart(2, '0') : null,
+        stopHours: completed ? 0 : 0,
+        stopType: completed ? '' : 'programado',
+        mainStop: completed ? '' : 'Registro incompleto o secadora sin cierre de descarga.',
+        notes: sourceNotes,
+        createdAt,
+        updatedAt: nowISO(),
+        source: 'bulk',
+        sourceRow: index + 1,
+        loadAt,
+        unloadAt,
+        siloLoad: row(2),
+        humidityIn: row(5),
+        tempIn: row(6),
+        responsibleLoad: row(7),
+        humidityOut: row(10),
+        tempOut: row(11),
+        siloOut: row(12),
+        responsibleOut: row(13),
+        yieldHead: performanceHead,
+        yieldRaw: performanceRaw,
+        sourceLabel: 'Pega masiva'
+      });
+    });
+
+    return { rows, warnings: hasHeader ? [] : ['No se detectó encabezado; se importó por orden de columnas.'] };
+  }
+
+  function bulkPreview() {
+    const box = $('bulkImportInfo');
+    if (!box) return;
+    const text = $('bulkPasteInput').value;
+    const { rows, warnings } = parseBulkRows(text);
+    const completed = rows.filter(r => Number(r.secadas) > 0).length;
+    const pending = rows.length - completed;
+    const dates = [...new Set(rows.map(r => r.date).filter(Boolean))].length;
+    box.innerHTML = `
+      <strong>Vista previa</strong><br>
+      Filas detectadas: ${rows.length}<br>
+      Secadas reales: ${completed}<br>
+      Paros / pendientes: ${pending}<br>
+      Días con datos: ${dates}${warnings.length ? `<br>${warnings.map(escapeHtml).join('<br>')}` : ''}
+    `;
+  }
+
+  function bulkImport() {
+    const text = $('bulkPasteInput').value;
+    const { rows, warnings } = parseBulkRows(text);
+    if (!rows.length) {
+      showToast('Sin datos', 'Pega primero la tabla a importar.');
+      return;
+    }
+
+    const existing = new Set(state.records.map(r => `${r.date || ''}|${r.dryer || ''}|${r.createdAt || ''}|${Number(r.secadas) || 0}|${r.source || ''}`));
+    const before = state.records.length;
+    const newRows = rows.filter(r => {
+      const key = `${r.date || ''}|${r.dryer || ''}|${r.createdAt || ''}|${Number(r.secadas) || 0}|${r.source || ''}`;
+      if (existing.has(key)) return false;
+      existing.add(key);
+      return true;
+    });
+
+    if (!newRows.length) {
+      showToast('Sin cambios', 'Esos registros ya estaban cargados.');
+      return;
+    }
+
+    state.records = [...newRows, ...state.records];
+    saveState();
+    renderAll();
+    showToast('Importación lista', `Se agregaron ${newRows.length} registros${warnings.length ? ' con aviso de formato.' : ''}`);
+  }
+
+  function clearBulkPaste() {
+    $('bulkPasteInput').value = '';
+    $('bulkImportInfo').textContent = 'Listo para pegar datos.';
   }
 
   function buildNotification(title, message, type = 'info', scope = 'global') {
@@ -1129,6 +1443,7 @@
     renderUsers();
     topStops();
     recentActivity();
+    renderPeriodStats();
     renderCharts();
     renderMonthlyNotes();
     $('recordDate').value = $('recordDate').value || todayISO();
@@ -1142,6 +1457,9 @@
     $('saveRecordBtn').addEventListener('click', saveRecord);
     $('clearRecordBtn').addEventListener('click', resetRecordForm);
     $('todayBtn').addEventListener('click', () => { $('recordDate').value = todayISO(); showToast('Fecha asignada', 'Se cargó la fecha de hoy.'); });
+    $('bulkPreviewBtn').addEventListener('click', bulkPreview);
+    $('bulkImportBtn').addEventListener('click', bulkImport);
+    $('bulkClearBtn').addEventListener('click', clearBulkPaste);
     $('createUserBtn').addEventListener('click', createUser);
     $('saveSettingsBtn').addEventListener('click', saveSettings);
     $('resetSettingsBtn').addEventListener('click', resetSettings);
