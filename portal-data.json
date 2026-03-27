@@ -14,7 +14,7 @@
       "branch": "main",
       "path": "portal-data.json"
     },
-    "whatsappNumber": "",
+    "whatsappNumber": "+50495868906",
     "whatsappMessage": "Hola, comparto el estado del portal de secadas."
   },
   "users": {
@@ -76,8 +76,8 @@
       "NIGHT": "empty_12"
     },
     "github": {
-      "sha": "ef64f2c87eb6609e8b92251c991aadac3b377f2e",
-      "syncedAt": "2026-03-27T20:46:08.258Z"
+      "sha": "1ef8adabfbc2fda07f3c1fa7eaa5508390e62cbd",
+      "syncedAt": "2026-03-27T20:47:22.443Z"
     }
   }
 }
