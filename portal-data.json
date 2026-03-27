@@ -49,6 +49,23 @@
   },
   "records": [
     {
+      "id": "rec_czq2epcywqgh",
+      "user": "ADMIN",
+      "fullName": "Administrador",
+      "date": "2026-03-24",
+      "shift": "Día",
+      "dryer": "1",
+      "secadas": 0,
+      "durationHours": null,
+      "durationMinutes": null,
+      "stopHours": 12,
+      "stopType": "mecanico",
+      "mainStop": "La banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la Secadora 1.",
+      "notes": "",
+      "createdAt": "2026-03-27T22:51:20.177Z",
+      "updatedAt": "2026-03-27T22:51:20.177Z"
+    },
+    {
       "id": "rec_7vk8pltcwbn0",
       "user": "ADMIN",
       "fullName": "Administrador",
@@ -119,6 +136,16 @@
   ],
   "notifications": [
     {
+      "id": "notif_8hyicamhwqgh",
+      "title": "Paro registrado",
+      "message": "Administrador registró un paro principal en turno Día (2026-03-24).",
+      "type": "danger",
+      "scope": "record",
+      "createdAt": "2026-03-27T22:51:20.177Z",
+      "readBy": [],
+      "source": "system"
+    },
+    {
       "id": "notif_ol7rmcxvwbn0",
       "title": "Paro registrado",
       "message": "Administrador registró un paro principal en turno Noche (2026-03-23).",
@@ -187,8 +214,8 @@
       "NIGHT": "empty_12"
     },
     "github": {
-      "sha": "0d316db0f9fa39779d639a67130d159dad0bbe0a",
-      "syncedAt": "2026-03-27T22:50:33.074Z"
+      "sha": "4ed0f60fb54d838cf7634085846b259fde6a6b8f",
+      "syncedAt": "2026-03-27T22:51:02.184Z"
     }
   }
 }
