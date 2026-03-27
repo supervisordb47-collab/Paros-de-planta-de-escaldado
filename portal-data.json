@@ -176,7 +176,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T22:55:00.144Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -288,8 +290,8 @@
       "NIGHT": null
     },
     "github": {
-      "sha": "f25effb01ce8e335cdfd877a91902526c91c2f16",
-      "syncedAt": "2026-03-27T22:54:58.725Z"
+      "sha": "35984e3df796530f6ed656d41c327b5e6cff5e4e",
+      "syncedAt": "2026-03-27T22:55:58.892Z"
     }
   }
 }
