@@ -49,6 +49,23 @@
   },
   "records": [
     {
+      "id": "rec_1rqhbu3wmku6",
+      "user": "SELVIN",
+      "fullName": "Selvin Ariel Reaños Figueroa",
+      "date": "2026-03-27",
+      "shift": "Día",
+      "dryer": "2",
+      "secadas": 1,
+      "durationHours": "06",
+      "durationMinutes": "15",
+      "stopHours": 0,
+      "stopType": "",
+      "mainStop": "",
+      "notes": "",
+      "createdAt": "2026-03-27T22:43:26.334Z",
+      "updatedAt": "2026-03-27T22:43:26.334Z"
+    },
+    {
       "id": "rec_4lbe3hhh9vak",
       "user": "ADMIN",
       "fullName": "Administrador",
@@ -67,6 +84,16 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif_s7hsptznmku6",
+      "title": "Nuevo registro",
+      "message": "Selvin Ariel Reaños Figueroa registró 1 secadas en turno Día (2026-03-27).",
+      "type": "success",
+      "scope": "record",
+      "createdAt": "2026-03-27T22:43:26.334Z",
+      "readBy": [],
+      "source": "system"
+    },
     {
       "id": "notif_1xlecei99vak",
       "title": "Paro registrado",
@@ -106,8 +133,8 @@
       "NIGHT": "empty_12"
     },
     "github": {
-      "sha": null,
-      "syncedAt": "2026-03-27T22:42:25.873Z"
+      "sha": "35f6f32b1078feb78d94aa5ea15554113cd553d1",
+      "syncedAt": "2026-03-27T22:42:49.122Z"
     }
   }
 }
