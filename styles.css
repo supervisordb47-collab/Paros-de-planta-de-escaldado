@@ -75,6 +75,7 @@ textarea{min-height:118px; resize:vertical; line-height:1.5}
 .big-input,.big-select{height:56px; font-size:1rem}
 .big-textarea{min-height:138px; font-size:1rem}
 .login-actions,.form-actions,.row-actions,.topbar-actions,.panel-head-actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.topbar-actions{justify-content:flex-end}
 .btn,.link-btn{
   border:none; border-radius:16px; padding:13px 18px; cursor:pointer; transition:.18s ease;
 }
@@ -230,6 +231,11 @@ textarea{min-height:118px; resize:vertical; line-height:1.5}
 .pill{
   padding:8px 12px; border-radius:999px; background:#eef4ff; color:#294db8; font-size:.8rem; font-weight:900;
 }
+.sync-pill{display:inline-flex; width:fit-content}
+.sync-pill.ok{background:#ecfdf5; color:#047857}
+.sync-pill.warn{background:#fff7ed; color:#c2410c}
+.sync-pill.danger{background:#fff1f2; color:#be123c}
+.note-sync{margin:0; color:var(--muted); font-size:.92rem; line-height:1.5; background:#f8fbff; border:1px dashed #cfe0f5; padding:12px 14px; border-radius:18px}
 .chart-box{width:100%; overflow:auto}
 canvas{width:100%; height:auto; display:block}
 .stack{display:grid; gap:12px}
@@ -257,6 +263,8 @@ canvas{width:100%; height:auto; display:block}
 .small-btn.primary{background:#eef4ff; color:var(--blue)}
 .small-btn.danger{background:#fff0f0; color:#b91c1c}
 .small-btn.soft{background:#f7fbff; color:#0f766e}
+.wa-btn{display:inline-flex; gap:8px; align-items:center; justify-content:center}
+.wa-btn svg{flex:0 0 auto}
 .soft-title{font-weight:900; margin-bottom:10px}
 .list{margin:0; padding-left:18px; color:var(--muted); line-height:1.7}
 .backup-box{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px}
