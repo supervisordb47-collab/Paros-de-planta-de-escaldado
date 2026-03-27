@@ -1,0 +1,30 @@
+```json id="uh2c84"
+{
+  "settings": {
+    "portalName": "Portal de Secadas",
+    "tagline": "Monitoreo operativo en tiempo real",
+    "dailyGoal": 20,
+    "monthlyGoal": 600,
+    "inactivityHours": 4,
+    "theme": "dark"
+  },
+  "users": [
+    {
+      "id": "u-admin",
+      "username": "admin",
+      "fullName": "Administrador",
+      "password": "1234",
+      "role": "admin",
+      "active": true
+    }
+  ],
+  "records": [],
+  "notifications": [],
+  "meta": {
+    "notificationState": {
+      "day": null,
+      "night": null
+    }
+  }
+}
+```
