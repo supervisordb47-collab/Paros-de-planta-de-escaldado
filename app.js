@@ -1,6 +1,7 @@
 (() => {
-  const STORAGE_KEY = 'secadas_portal_state_v1';
   const SESSION_KEY = 'secadas_portal_session_v1';
+  const GITHUB_TOKEN_KEY = 'secadas_portal_github_token_v1';
+  const DEFAULT_GITHUB_FILE = 'portal-state.json';
 
   const $ = (id) => document.getElementById(id);
 
@@ -132,30 +133,130 @@
     return out;
   }
 
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return defaultState();
-      const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== 'object') return defaultState();
-      parsed.settings = { ...defaultState().settings, ...(parsed.settings || {}) };
-      parsed.users = normalizeUsers(parsed.users || defaultState().users);
-      parsed.records = Array.isArray(parsed.records) ? parsed.records : [];
-      parsed.notifications = Array.isArray(parsed.notifications) ? parsed.notifications : [];
-      parsed.meta = parsed.meta || defaultState().meta;
-      parsed.meta.notificationState = parsed.meta.notificationState || { DAY: null, NIGHT: null };
-      return parsed;
-    } catch {
-      return defaultState();
-    }
+  function mergeSettings(base, incoming) {
+    const merged = { ...base, ...(incoming || {}) };
+    merged.githubSync = {
+      ...(base.githubSync || {}),
+      ...((incoming && incoming.githubSync) || {})
+    };
+    delete merged.githubSync.token;
+    merged.whatsappNumber = safe(merged.whatsappNumber || '');
+    merged.whatsappMessage = safe(merged.whatsappMessage || 'Hola, comparto el estado del portal de secadas.');
+    return merged;
   }
 
-  function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  function loadGitHubToken() {
+    try { return safe(sessionStorage.getItem(GITHUB_TOKEN_KEY)); } catch { return ''; }
+  }
+
+  function saveGitHubToken(token) {
+    try {
+      const value = safe(token);
+      if (!value) sessionStorage.removeItem(GITHUB_TOKEN_KEY);
+      else sessionStorage.setItem(GITHUB_TOKEN_KEY, value);
+    } catch {}
+  }
+
+  function inferGitHubBootstrap() {
+    const host = String(location.hostname || '').toLowerCase();
+    const parts = String(location.pathname || '').split('/').filter(Boolean);
+    if (!host.endsWith('github.io') || !parts.length) return {};
+    return {
+      owner: host.replace('.github.io', ''),
+      repo: parts[0],
+      branch: 'main',
+      path: DEFAULT_GITHUB_FILE
+    };
+  }
+
+  function loadState() {
+    const parsed = clone(defaultState());
+    parsed.settings = mergeSettings(parsed.settings, parsed.settings);
+    const inferred = inferGitHubBootstrap();
+    parsed.settings.githubSync = { ...parsed.settings.githubSync, ...inferred };
+    if (parsed.settings.githubSync.owner && parsed.settings.githubSync.repo) {
+      parsed.settings.githubSync.enabled = true;
+    }
+    return parsed;
+  }
+
+  function githubConfig() {
+    const cfg = state?.settings?.githubSync || {};
+    const bootstrap = inferGitHubBootstrap();
+    const owner = safe(cfg.owner || bootstrap.owner);
+    const repo = safe(cfg.repo || bootstrap.repo);
+    const branch = safe(cfg.branch || bootstrap.branch) || 'main';
+    const path = safe(cfg.path || bootstrap.path) || DEFAULT_GITHUB_FILE;
+    const token = loadGitHubToken();
+    return {
+      enabled: !!cfg.enabled,
+      owner,
+      repo,
+      branch,
+      path,
+      token
+    };
+  }
+
+  function githubRawUrl(cfg) {
+    return `https://raw.githubusercontent.com/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/${encodeURIComponent(cfg.branch || 'main')}/${cfg.path.split('/').map(encodeURIComponent).join('/')}`;
+  }
+
+  function isGitHubConfigured() {
+    const cfg = githubConfig();
+    return cfg.enabled && !!cfg.owner && !!cfg.repo;
+  }
+
+  function isGitHubSyncReady() {
+    const cfg = githubConfig();
+    return isGitHubConfigured() && !!cfg.token;
+  }
+
+  function githubApiUrl(pathPart = '') {
+    const cfg = githubConfig();
+    return `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${pathPart || encodeURIComponent(cfg.path)}${cfg.branch ? `?ref=${encodeURIComponent(cfg.branch)}` : ''}`;
+  }
+
+  async function readStateFromGitHub() {
+    const cfg = githubConfig();
+    if (!isGitHubConfigured()) return null;
+
+    if (!cfg.token) {
+      const rawUrl = githubRawUrl(cfg);
+      const res = await fetch(rawUrl, { cache: 'no-store' });
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error(`GitHub raw respondió ${res.status}`);
+      const parsed = await res.json();
+      parsed.meta = parsed.meta || defaultState().meta;
+      parsed.meta.github = { sha: null, syncedAt: nowISO() };
+      return parsed;
+    }
+
+    const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${encodeURIComponent(cfg.path)}?ref=${encodeURIComponent(cfg.branch)}`;
+    const res = await fetch(url, {
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `Bearer ${cfg.token}`,
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`GitHub respondió ${res.status}`);
+    const payload = await res.json();
+    if (!payload?.content) return null;
+    const json = atob(String(payload.content).replace(/\n/g, ''));
+    const parsed = JSON.parse(decodeURIComponent(escape(json)));
+    parsed.meta = parsed.meta || defaultState().meta;
+    parsed.meta.github = { sha: payload.sha || null, syncedAt: nowISO() };
+    return parsed;
   }
 
   let state = loadState();
   let session = null;
+  let syncTimer = null;
+  let syncInFlight = false;
+  let pendingSync = false;
+  let lastSyncError = '';
   let editingRecordId = null;
   let notificationTimer = null;
 
@@ -183,7 +284,7 @@
 
   function loadSession() {
     try {
-      const raw = localStorage.getItem(SESSION_KEY);
+      const raw = sessionStorage.getItem(SESSION_KEY);
       session = raw ? JSON.parse(raw) : null;
       if (session?.username) session.username = normalizeUser(session.username);
     } catch {
@@ -192,8 +293,115 @@
   }
 
   function saveSession() {
-    if (!session) localStorage.removeItem(SESSION_KEY);
-    else localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    if (!session) sessionStorage.removeItem(SESSION_KEY);
+    else sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  }
+
+
+  function updateSyncBadge(stateLabel, extra = '') {
+    const el = $('syncBadge');
+    if (!el) return;
+    el.textContent = extra ? `${stateLabel} · ${extra}` : stateLabel;
+    el.className = `pill sync-pill ${stateLabel === 'Sincronizado' ? 'ok' : stateLabel === 'Sin conexión' ? 'danger' : 'warn'}`;
+  }
+
+  function saveState() {
+    queueStateSync();
+  }
+
+  function queueStateSync() {
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => {
+      persistStateToGitHub().catch(() => {});
+    }, 700);
+    const cfgReady = isGitHubConfigured();
+    updateSyncBadge(isGitHubSyncReady() ? 'Pendiente de sync' : (cfgReady ? 'Falta token' : 'Sin conexión'), cfgReady ? (isGitHubSyncReady() ? 'GitHub' : 'agrega token') : 'configurar GitHub');
+  }
+
+  async function persistStateToGitHub() {
+    if (!isGitHubSyncReady()) {
+      lastSyncError = 'Configura GitHub para guardar en la nube.';
+      updateSyncBadge('Sin conexión', 'GitHub no configurado');
+      return false;
+    }
+    const cfg = githubConfig();
+    if (!cfg.token) {
+      lastSyncError = 'Falta el token de GitHub para guardar.';
+      updateSyncBadge('Falta token', 'agrega token');
+      return false;
+    }
+    if (syncInFlight) {
+      pendingSync = true;
+      return false;
+    }
+    syncInFlight = true;
+    try {
+      const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${encodeURIComponent(cfg.path)}`;
+      const headers = {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `Bearer ${cfg.token}`,
+        'X-GitHub-Api-Version': '2022-11-28'
+      };
+      let sha = state?.meta?.github?.sha || null;
+      if (!sha) {
+        const probe = await fetch(`${url}?ref=${encodeURIComponent(cfg.branch)}`, { headers });
+        if (probe.ok) {
+          const current = await probe.json();
+          sha = current.sha || null;
+        }
+      }
+      const payloadState = clone(state);
+      if (payloadState?.settings?.githubSync) delete payloadState.settings.githubSync.token;
+      const body = {
+        message: `Sync portal secadas ${new Date().toISOString()}`,
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(payloadState, null, 2)))),
+        branch: cfg.branch || 'main'
+      };
+      if (sha) body.sha = sha;
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`No se pudo guardar en GitHub (${res.status})`);
+      const payload = await res.json();
+      state.meta = state.meta || defaultState().meta;
+      state.meta.github = { sha: payload.content?.sha || sha || null, syncedAt: nowISO() };
+      lastSyncError = '';
+      updateSyncBadge('Sincronizado', cfg.branch || 'main');
+      return true;
+    } catch (err) {
+      lastSyncError = err?.message || 'Error de sincronización';
+      updateSyncBadge('Sin conexión', 'revisar GitHub');
+      return false;
+    } finally {
+      syncInFlight = false;
+      if (pendingSync) {
+        pendingSync = false;
+        queueStateSync();
+      }
+    }
+  }
+
+  async function initializeState() {
+    state = loadState();
+    const remote = await readStateFromGitHub().catch(() => null);
+    if (remote && typeof remote === 'object') {
+      state = {
+        ...clone(defaultState()),
+        ...remote,
+        settings: mergeSettings(defaultState().settings, remote.settings || {}),
+        users: normalizeUsers(remote.users || defaultState().users),
+        records: Array.isArray(remote.records) ? remote.records : [],
+        notifications: Array.isArray(remote.notifications) ? remote.notifications : [],
+        meta: remote.meta || clone(defaultState().meta)
+      };
+      state.meta.github = remote.meta?.github || state.meta.github || null;
+      updateSyncBadge('Sincronizado', githubConfig().branch || 'main');
+    } else {
+      const cfgReady = isGitHubConfigured();
+    updateSyncBadge(isGitHubSyncReady() ? 'Pendiente de sync' : (cfgReady ? 'Falta token' : 'Sin conexión'), cfgReady ? (isGitHubSyncReady() ? 'GitHub' : 'agrega token') : 'configurar GitHub');
+    }
   }
 
   function resetPortal() {
@@ -698,6 +906,18 @@
     }
   }
 
+  function whatsappLinkForSummary() {
+    const cfg = state.settings || {};
+    const text = safe(cfg.whatsappMessage) || `Resumen del portal de secadas: ${recordSummary().total} secadas acumuladas.`;
+    const number = safe(cfg.whatsappNumber).replace(/[^\d]/g, '');
+    const url = number ? `https://wa.me/${number}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    return url;
+  }
+
+  function openWhatsApp() {
+    window.open(whatsappLinkForSummary(), '_blank', 'noopener,noreferrer');
+  }
+
   function recordDurationText(r) {
     if (r.secadas === 0) return `${Number(r.stopHours || 0).toFixed(1)} h`;
     const h = String(r.durationHours || '00').padStart(2, '0');
@@ -1145,6 +1365,16 @@
     state.settings.monthlyTarget = Math.max(1, toNumber($('settingMonthlyTarget').value, 180));
     state.settings.alertHours = Math.max(1, toNumber($('settingAlertHours').value, 12));
     state.settings.theme = $('settingTheme').value || 'blue';
+    state.settings.githubSync = {
+      enabled: $('settingGitHubEnabled').value === 'true',
+      owner: safe($('settingGitHubOwner').value) || inferGitHubBootstrap().owner,
+      repo: safe($('settingGitHubRepo').value) || inferGitHubBootstrap().repo,
+      branch: safe($('settingGitHubBranch').value) || 'main',
+      path: safe($('settingGitHubPath').value) || DEFAULT_GITHUB_FILE
+    };
+    saveGitHubToken($('settingGitHubToken').value);
+    state.settings.whatsappNumber = safe($('settingWhatsappNumber').value);
+    state.settings.whatsappMessage = safe($('settingWhatsappMessage').value) || 'Hola, comparto el estado del portal de secadas.';
     setTheme(state.settings.theme);
     saveState();
     renderAll();
@@ -1154,6 +1384,7 @@
   function resetSettings() {
     if (!isAdmin()) return;
     state.settings = clone(defaultState().settings);
+    saveGitHubToken('');
     saveState();
     renderAll();
     showToast('Ajustes restaurados', 'Se aplicó la configuración base.');
@@ -1197,6 +1428,7 @@
         state = {
           ...clone(defaultState()),
           ...imported,
+          settings: mergeSettings(defaultState().settings, imported.settings || {}),
           users: normalizeUsers(imported.users),
           meta: imported.meta || clone(defaultState().meta)
         };
@@ -1399,7 +1631,17 @@
     $('settingMonthlyTarget').value = state.settings.monthlyTarget || 180;
     $('settingAlertHours').value = state.settings.alertHours || 12;
     $('settingTheme').value = state.settings.theme || 'blue';
+    $('settingGitHubEnabled').value = state.settings.githubSync?.enabled ? 'true' : 'false';
+    $('settingGitHubOwner').value = state.settings.githubSync?.owner || inferGitHubBootstrap().owner || '';
+    $('settingGitHubRepo').value = state.settings.githubSync?.repo || inferGitHubBootstrap().repo || '';
+    $('settingGitHubBranch').value = state.settings.githubSync?.branch || inferGitHubBootstrap().branch || 'main';
+    $('settingGitHubPath').value = state.settings.githubSync?.path || DEFAULT_GITHUB_FILE;
+    $('settingGitHubToken').value = loadGitHubToken();
+    $('settingWhatsappNumber').value = state.settings.whatsappNumber || '';
+    $('settingWhatsappMessage').value = state.settings.whatsappMessage || '';
     setTheme(state.settings.theme || 'blue');
+    const cfgReady = isGitHubConfigured();
+    updateSyncBadge(isGitHubSyncReady() ? 'Sincronizado' : (cfgReady ? 'Falta token' : 'Pendiente de sync'), cfgReady ? (isGitHubSyncReady() ? 'GitHub' : 'agrega token') : 'configurar GitHub');
   }
 
   function updateHeader() {
@@ -1418,6 +1660,8 @@
     if (recents) {
       $('topbarText').textContent = `Último registro: ${recents.shift} · ${fmtDateOnly(recents.date)} · Secadas ${recents.secadas}`;
     }
+    const cfgReady = isGitHubConfigured();
+    updateSyncBadge(isGitHubSyncReady() ? 'Sincronizado' : (cfgReady ? 'Falta token' : 'Pendiente de sync'), cfgReady ? (isGitHubSyncReady() ? 'GitHub' : 'agrega token') : 'configurar GitHub');
   }
 
   function renderMonthlyNotes() {
@@ -1465,6 +1709,8 @@
     $('resetSettingsBtn').addEventListener('click', resetSettings);
     $('exportJsonBtn').addEventListener('click', exportJson);
     $('exportCsvBtn').addEventListener('click', exportCsv);
+    $('syncNowBtn').addEventListener('click', syncNow);
+    $('whatsAppBtn').addEventListener('click', openWhatsApp);
     $('importJsonBtn').addEventListener('click', () => $('importJsonInput').click());
     $('importJsonInput').addEventListener('change', readFileInput);
     $('factoryResetBtn').addEventListener('click', () => { if (confirm('¿Restaurar base completa?')) resetPortal(); });
@@ -1536,12 +1782,13 @@
     syncRecordFields();
   }
 
-  function boot() {
+  async function boot() {
     loadSession();
     fillDurationOptions();
     bindNav();
     bindControls();
     initialFill();
+    await initializeState();
     setTheme(state.settings.theme || 'blue');
     if (session && currentUser()) {
       $('loginView').classList.add('hidden');
@@ -1567,6 +1814,5 @@
     resetPortal
   };
 
-  loadSession();
   boot();
 })();
