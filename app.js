@@ -548,22 +548,39 @@ async function syncNow(reason = 'Sincronizar ahora') {
     return false;
   }
   syncInFlight = true;
+  let lastErr = null;
   try {
     setSyncStatus('syncing', 'Sincronizando', 'Leyendo nube, unificando cambios y guardando.');
-    const remote = await fetchRemoteSnapshot().catch(() => ({ exists: false, sha: null, state: null }));
-    const merged = mergeStates(remote.state || {}, state);
-    ensureGithubDefaults();
-    merged.settings.github = { ...githubConfig() };
-    merged.settings.whatsappNumber = safe(state.settings.whatsappNumber || '');
-    merged.settings.whatsappMessage = safe(state.settings.whatsappMessage || '');
-    await pushRemoteSnapshot(merged, remote.sha, reason);
-    state = merged;
-    state.meta = state.meta || {};
-    state.meta.lastSyncAt = nowISO();
-    saveSession();
-    renderAll();
-    setSyncStatus('ok', 'Sincronizado', `Última actualización ${fmtDate(nowISO())}`);
-    return true;
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        const remote = await fetchRemoteSnapshot().catch(() => ({ exists: false, sha: null, state: null }));
+        const merged = mergeStates(remote.state || {}, state);
+        ensureGithubDefaults();
+        merged.settings.github = { ...githubConfig() };
+        merged.settings.whatsappNumber = safe(state.settings.whatsappNumber || '');
+        merged.settings.whatsappMessage = safe(state.settings.whatsappMessage || '');
+        await pushRemoteSnapshot(merged, remote.sha, reason);
+        state = merged;
+        state.meta = state.meta || {};
+        state.meta.lastSyncAt = nowISO();
+        saveSession();
+        renderAll();
+        setSyncStatus('ok', 'Sincronizado', `Última actualización ${fmtDate(nowISO())}`);
+        return true;
+      } catch (err) {
+        lastErr = err;
+        const msg = String(err?.message || err || '');
+        const retryable = /sha|conflict|409|422|updated|fresh|stale/i.test(msg);
+        if (attempt === 0 && retryable) {
+          setSyncStatus('warn', 'Reintentando', 'GitHub cambió la base; se vuelve a leer antes de guardar.');
+          await new Promise(r => setTimeout(r, 350));
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw lastErr || new Error('No se pudo sincronizar.');
   } catch (err) {
     setSyncStatus('error', 'Error de sincronización', err.message || 'No se pudo guardar en GitHub.');
     showToast('Sincronización fallida', err.message || 'No se pudo guardar en GitHub.');
@@ -697,7 +714,7 @@ function renderStopJustifications() {
     editingRecordId = null;
     saveState();
     renderAll();
-    showToast('Base restaurada', 'Se cargó la configuración inicial del sistema.');
+    showToast('Base inicial cargada', 'Se cargó la configuración inicial del sistema.');
   }
 
   function login() {
@@ -2031,7 +2048,6 @@ function renderStopJustifications() {
 
   function bindControls() {
     $('loginBtn').addEventListener('click', login);
-    $('loginResetBtn').addEventListener('click', resetPortal);
     $('logoutBtn').addEventListener('click', logout);
     $('saveRecordBtn').addEventListener('click', saveRecord);
     $('clearRecordBtn').addEventListener('click', resetRecordForm);
@@ -2057,7 +2073,6 @@ function renderStopJustifications() {
       $('importJsonInput').click();
     });
     $('importJsonInput').addEventListener('change', readFileInput);
-    $('factoryResetBtn').addEventListener('click', () => { if (confirm('¿Restaurar base completa?')) resetPortal(); });
     $('refreshBtn').addEventListener('click', async () => {
       await pullFromGithub(false);
       checkIdleAlerts();
