@@ -7,15 +7,22 @@
     "alertHours": 12,
     "totalDryers": 3,
     "theme": "blue",
+    "github": {
+      "owner": "supervisordb47-collab",
+      "repo": "Paros-de-planta-de-escaldado",
+      "branch": "main",
+      "path": "portal-data.json",
+      "autoSync": true
+    },
+    "whatsappNumber": "+50488305122",
+    "whatsappMessage": "Hola, necesito apoyo con el portal de secadas.",
     "githubSync": {
       "enabled": true,
       "owner": "supervisordb47-collab",
       "repo": "Paros-de-planta-de-escaldado",
       "branch": "main",
       "path": "portal-data.json"
-    },
-    "whatsappNumber": "",
-    "whatsappMessage": "Hola, comparto el estado del portal de secadas."
+    }
   },
   "users": {
     "ADMIN": {
@@ -37,14 +44,14 @@
       "fullName": "Gadiel",
       "password": "gadiel",
       "role": "operador",
-      "active": false
+      "active": true
     },
     "JOSE": {
       "username": "JOSE",
       "fullName": "Jose",
       "password": "jose",
       "role": "operador",
-      "active": false
+      "active": true
     }
   },
   "records": [
@@ -63,7 +70,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-28T13:46:59.111Z",
-      "updatedAt": "2026-03-28T13:46:59.111Z"
+      "updatedAt": "2026-03-28T13:46:59.111Z",
+      "recordKey": "2026-03-27|2026-03-28t13:46:59.111z||2|admin|||1|07|15|0|||noche"
     },
     {
       "id": "rec_p5vpuf61t3zd",
@@ -80,7 +88,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-28T13:44:18.793Z",
-      "updatedAt": "2026-03-28T13:44:18.793Z"
+      "updatedAt": "2026-03-28T13:44:18.793Z",
+      "recordKey": "2026-03-27|2026-03-28t13:44:18.793z||3|admin|||1|06|30|0|||día"
     },
     {
       "id": "rec_1rojcfzeri9k",
@@ -97,7 +106,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-28T13:43:03.992Z",
-      "updatedAt": "2026-03-28T13:43:03.992Z"
+      "updatedAt": "2026-03-28T13:43:03.992Z",
+      "recordKey": "2026-03-27|2026-03-28t13:43:03.992z||2|admin|||1|07|30|0|||día"
     },
     {
       "id": "rec_n5hwfg8kjcev",
@@ -114,7 +124,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:08:55.063Z",
-      "updatedAt": "2026-03-27T23:08:55.063Z"
+      "updatedAt": "2026-03-27T23:08:55.063Z",
+      "recordKey": "2026-03-25|2026-03-27t23:08:55.063z||2|admin|||1|07|15|0|||noche"
     },
     {
       "id": "rec_sibidzxbhkx7",
@@ -131,7 +142,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:07:32.779Z",
-      "updatedAt": "2026-03-27T23:07:32.779Z"
+      "updatedAt": "2026-03-27T23:07:32.779Z",
+      "recordKey": "2026-03-25|2026-03-27t23:07:32.779z||2|admin|||1|06|45|0|||noche"
     },
     {
       "id": "rec_6td6ebpwftuf",
@@ -148,7 +160,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:06:11.031Z",
-      "updatedAt": "2026-03-27T23:06:11.031Z"
+      "updatedAt": "2026-03-27T23:06:11.031Z",
+      "recordKey": "2026-03-26|2026-03-27t23:06:11.031z||3|admin|||1|07|30|0|||día"
     },
     {
       "id": "rec_bd8t3jwmeg88",
@@ -165,7 +178,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:05:06.728Z",
-      "updatedAt": "2026-03-27T23:05:06.728Z"
+      "updatedAt": "2026-03-27T23:05:06.728Z",
+      "recordKey": "2026-03-26|2026-03-27t23:05:06.728z||3|admin|||1|07|15|0|||noche"
     },
     {
       "id": "rec_euligxi3e0xe",
@@ -182,7 +196,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:04:46.899Z",
-      "updatedAt": "2026-03-27T23:04:46.899Z"
+      "updatedAt": "2026-03-27T23:04:46.899Z",
+      "recordKey": "2026-03-26|2026-03-27t23:04:46.899z||2|admin|||1|06|15|0|||noche"
     },
     {
       "id": "rec_ycavpohxc51w",
@@ -199,7 +214,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:03:18.932Z",
-      "updatedAt": "2026-03-27T23:03:18.932Z"
+      "updatedAt": "2026-03-27T23:03:18.932Z",
+      "recordKey": "2026-03-25|2026-03-27t23:03:18.932z||2|admin|||1|07|15|0|||noche"
     },
     {
       "id": "rec_jr9wegonbmdz",
@@ -216,7 +232,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:02:54.743Z",
-      "updatedAt": "2026-03-27T23:02:54.743Z"
+      "updatedAt": "2026-03-27T23:02:54.743Z",
+      "recordKey": "2026-03-25|2026-03-27t23:02:54.743z||3|admin|||1|06|30|0|||día"
     },
     {
       "id": "rec_9y071u0ob9u8",
@@ -233,7 +250,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:02:38.480Z",
-      "updatedAt": "2026-03-27T23:02:38.480Z"
+      "updatedAt": "2026-03-27T23:02:38.480Z",
+      "recordKey": "2026-03-25|2026-03-27t23:02:38.480z||2|admin|||1|06|30|0|||día"
     },
     {
       "id": "rec_8kqtqth3ae5i",
@@ -250,7 +268,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:01:57.414Z",
-      "updatedAt": "2026-03-27T23:01:57.414Z"
+      "updatedAt": "2026-03-27T23:01:57.414Z",
+      "recordKey": "2026-03-24|2026-03-27t23:01:57.414z||3|admin|||1|07|00|0|||noche"
     },
     {
       "id": "rec_m50qly64a1ep",
@@ -267,7 +286,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:01:40.897Z",
-      "updatedAt": "2026-03-27T23:01:40.897Z"
+      "updatedAt": "2026-03-27T23:01:40.897Z",
+      "recordKey": "2026-03-24|2026-03-27t23:01:40.897z||2|admin|||1|06|45|0|||noche"
     },
     {
       "id": "rec_cbofhkwj88uz",
@@ -284,7 +304,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T23:00:17.243Z",
-      "updatedAt": "2026-03-27T23:00:17.243Z"
+      "updatedAt": "2026-03-27T23:00:17.243Z",
+      "recordKey": "2026-03-23|2026-03-27t23:00:17.243z||2|admin|||1|06|45|0|||día"
     },
     {
       "id": "rec_h74drqka5fye",
@@ -301,7 +322,8 @@
       "mainStop": "Falta de carga por falta de materia prima leitada; no se contaba con granza mojada.",
       "notes": "",
       "createdAt": "2026-03-27T22:58:06.470Z",
-      "updatedAt": "2026-03-27T22:58:06.470Z"
+      "updatedAt": "2026-03-27T22:58:06.470Z",
+      "recordKey": "2026-03-23|2026-03-27t22:58:06.470z||3|admin|||0|||12|carga|falta de carga por falta de materia prima leitada; no se contaba con granza mojada.|noche"
     },
     {
       "id": "rec_dwh87ktl4aer",
@@ -318,7 +340,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T22:57:12.627Z",
-      "updatedAt": "2026-03-27T22:57:12.627Z"
+      "updatedAt": "2026-03-27T22:57:12.627Z",
+      "recordKey": "2026-03-23|2026-03-27t22:57:12.627z||2|admin|||1|07|30|0|||noche"
     },
     {
       "id": "rec_hp8q7zfl1g6o",
@@ -335,7 +358,8 @@
       "mainStop": "",
       "notes": "",
       "createdAt": "2026-03-27T22:55:00.144Z",
-      "updatedAt": "2026-03-27T22:55:00.144Z"
+      "updatedAt": "2026-03-27T22:55:00.144Z",
+      "recordKey": "2026-03-23|2026-03-27t22:55:00.144z||3|admin|||1|06|45|0|||día"
     },
     {
       "id": "rec_ilv89gi6y3ed",
@@ -352,7 +376,8 @@
       "mainStop": "La banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la Secadora 1.",
       "notes": "",
       "createdAt": "2026-03-27T22:52:23.605Z",
-      "updatedAt": "2026-03-27T22:52:23.605Z"
+      "updatedAt": "2026-03-27T22:52:23.605Z",
+      "recordKey": "2026-03-26|2026-03-27t22:52:23.605z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día"
     },
     {
       "id": "rec_ero203boxoe9",
@@ -369,7 +394,8 @@
       "mainStop": "La banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la Secadora 1.",
       "notes": "",
       "createdAt": "2026-03-27T22:52:04.161Z",
-      "updatedAt": "2026-03-27T22:52:04.161Z"
+      "updatedAt": "2026-03-27T22:52:04.161Z",
+      "recordKey": "2026-03-25|2026-03-27t22:52:04.161z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|noche"
     },
     {
       "id": "rec_czq2epcywqgh",
@@ -386,7 +412,8 @@
       "mainStop": "La banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la Secadora 1.",
       "notes": "",
       "createdAt": "2026-03-27T22:51:20.177Z",
-      "updatedAt": "2026-03-27T22:51:20.177Z"
+      "updatedAt": "2026-03-27T22:51:20.177Z",
+      "recordKey": "2026-03-24|2026-03-27t22:51:20.177z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día"
     },
     {
       "id": "rec_7vk8pltcwbn0",
@@ -403,7 +430,8 @@
       "mainStop": "La banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la Secadora 1.",
       "notes": "",
       "createdAt": "2026-03-27T22:51:00.972Z",
-      "updatedAt": "2026-03-27T22:51:00.972Z"
+      "updatedAt": "2026-03-27T22:51:00.972Z",
+      "recordKey": "2026-03-23|2026-03-27t22:51:00.972z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|noche"
     },
     {
       "id": "rec_issaplyxvp0j",
@@ -420,7 +448,8 @@
       "mainStop": "La banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la Secadora 1.",
       "notes": "",
       "createdAt": "2026-03-27T22:50:31.651Z",
-      "updatedAt": "2026-03-27T22:50:31.651Z"
+      "updatedAt": "2026-03-27T22:50:31.651Z",
+      "recordKey": "2026-03-23|2026-03-27t22:50:31.651z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día"
     },
     {
       "id": "rec_4lbe3hhh9vak",
@@ -437,7 +466,8 @@
       "mainStop": "La banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la Secadora 1.",
       "notes": "",
       "createdAt": "2026-03-27T21:09:34.508Z",
-      "updatedAt": "2026-03-27T21:09:34.508Z"
+      "updatedAt": "2026-03-27T21:09:34.508Z",
+      "recordKey": "2026-03-27|2026-03-27t21:09:34.508z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día"
     }
   ],
   "notifications": [
@@ -449,7 +479,8 @@
       "scope": "record",
       "createdAt": "2026-03-28T13:46:59.111Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_d5uau5apt3zd",
@@ -459,7 +490,8 @@
       "scope": "record",
       "createdAt": "2026-03-28T13:44:18.793Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_8sqhtu9qri9k",
@@ -469,7 +501,8 @@
       "scope": "record",
       "createdAt": "2026-03-28T13:43:03.992Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_ijov3ea8nn80",
@@ -481,7 +514,8 @@
       "readBy": [
         "ADMIN"
       ],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_l1o0zsqvnn7r",
@@ -491,7 +525,8 @@
       "scope": "shift",
       "createdAt": "2026-03-28T12:44:04.551Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_yn3qv2qkjcev",
@@ -501,7 +536,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:08:55.063Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_cy0k0zrxhkx7",
@@ -511,7 +547,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:07:32.779Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_mnqk2on3ftuf",
@@ -521,7 +558,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:06:11.031Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_pls53oubeg88",
@@ -531,7 +569,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:05:06.728Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_2dur6fpge0xf",
@@ -541,7 +580,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:04:46.899Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_ee4xzjlbc51w",
@@ -551,7 +591,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:03:18.932Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_mk00gtg0bmdz",
@@ -561,7 +602,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:02:54.743Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_41zbjulkb9u8",
@@ -571,7 +613,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:02:38.480Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_merlthixae5i",
@@ -581,7 +624,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:01:57.414Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_vrlz233ua1ep",
@@ -591,7 +635,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:01:40.897Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_epkxfanb88uz",
@@ -601,7 +646,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T23:00:17.243Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_kreubt6w5fye",
@@ -611,7 +657,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T22:58:06.470Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_yg4qnux74aer",
@@ -621,7 +668,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T22:57:12.627Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_dnlk8z881g6o",
@@ -633,7 +681,8 @@
       "readBy": [
         "ADMIN"
       ],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_1bfl8zna04lc",
@@ -643,7 +692,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T22:53:58.464Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_dbc37okfy3ed",
@@ -653,7 +703,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T22:52:23.605Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_f3fuh9zbxoe9",
@@ -663,7 +714,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T22:52:04.161Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_8hyicamhwqgh",
@@ -673,7 +725,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T22:51:20.177Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_ol7rmcxvwbn0",
@@ -683,7 +736,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T22:51:00.972Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_5lh8z2csvp0j",
@@ -693,7 +747,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T22:50:31.651Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_s7hsptznmku6",
@@ -703,7 +758,8 @@
       "scope": "record",
       "createdAt": "2026-03-27T22:43:26.334Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_1xlecei99vak",
@@ -715,7 +771,8 @@
       "readBy": [
         "ADMIN"
       ],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_x8azd5xtiy5l",
@@ -725,7 +782,8 @@
       "scope": "shift",
       "createdAt": "2026-03-27T20:48:38.505Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     },
     {
       "id": "notif_upbo2suliy5l",
@@ -735,17 +793,19 @@
       "scope": "shift",
       "createdAt": "2026-03-27T20:48:38.505Z",
       "readBy": [],
-      "source": "system"
+      "source": "system",
+      "updatedAt": "2026-03-28T20:23:31.771Z"
     }
   ],
   "meta": {
     "notificationState": {
       "DAY": null,
-      "NIGHT": "rec_n5hwfg8kjcev_12"
+      "NIGHT": null
     },
     "github": {
       "sha": null,
       "syncedAt": "2026-03-28T20:09:12.179Z"
-    }
+    },
+    "updatedAt": "2026-03-28T20:23:31.461Z"
   }
 }
