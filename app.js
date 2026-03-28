@@ -335,6 +335,12 @@ function normalizeRecordItem(rec) {
     updatedAt: rec.updatedAt || nowISO()
   };
   if (!normalized.date) normalized.date = isoToDateKey(normalized.createdAt) || todayISO();
+  normalized.recordKey = safe(rec.recordKey) || recordFingerprint({
+    ...normalized,
+    loadAt: rec.loadAt || normalized.createdAt,
+    unloadAt: rec.unloadAt || '',
+    shift: normalized.shift
+  });
   return normalized;
 }
 
@@ -363,13 +369,37 @@ function chooseNewer(a, b) {
   return stampValue(a) >= stampValue(b) ? a : b;
 }
 
+function normalizeSignatureValue(value) {
+  return safe(value).toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function recordFingerprint(rec = {}) {
+  return [
+    normalizeSignatureValue(rec.date || ''),
+    normalizeSignatureValue(rec.loadAt || rec.createdAt || ''),
+    normalizeSignatureValue(rec.unloadAt || ''),
+    normalizeSignatureValue(rec.dryer || ''),
+    normalizeSignatureValue(rec.user || rec.username || ''),
+    normalizeSignatureValue(rec.siloLoad || ''),
+    normalizeSignatureValue(rec.siloOut || ''),
+    normalizeSignatureValue(rec.secadas ?? ''),
+    normalizeSignatureValue(rec.durationHours ?? ''),
+    normalizeSignatureValue(rec.durationMinutes ?? ''),
+    normalizeSignatureValue(rec.stopHours ?? ''),
+    normalizeSignatureValue(rec.stopType || ''),
+    normalizeSignatureValue(rec.mainStop || ''),
+    normalizeSignatureValue(rec.shift || '')
+  ].join('|');
+}
+
 function mergeRecords(remote = [], local = []) {
   const map = new Map();
   [...remote, ...local].forEach(rec => {
     const item = normalizeRecordItem(rec);
     if (!item) return;
-    const prev = map.get(item.id);
-    map.set(item.id, prev ? chooseNewer(prev, item) : item);
+    const key = item.recordKey || recordFingerprint(item);
+    const prev = map.get(key);
+    map.set(key, prev ? chooseNewer(prev, item) : item);
   });
   return [...map.values()].sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')));
 }
@@ -950,6 +980,22 @@ function renderStopJustifications() {
         responsibleOut: row(13),
         yieldHead: performanceHead,
         yieldRaw: performanceRaw,
+        recordKey: recordFingerprint({
+          date: dateKey,
+          loadAt,
+          unloadAt,
+          dryer: String(dryer),
+          user,
+          secadas: completed ? 1 : 0,
+          durationHours: completed && unloadAt ? Math.max(0, Math.round((new Date(unloadAt).getTime() - new Date(loadAt).getTime()) / 3600000)) : null,
+          durationMinutes: completed && unloadAt ? String(Math.max(0, Math.round(((new Date(unloadAt).getTime() - new Date(loadAt).getTime()) % 3600000) / 60000))).padStart(2, '0') : null,
+          stopHours: autoStop ? 12 : 0,
+          stopType: autoStop ? 'programado' : '',
+          mainStop: autoStop ? `Secadora ${dryer} sin producción registrada. Pendiente de justificar.` : '',
+          shift: loadAt ? (new Date(loadAt).getHours() >= 6 && new Date(loadAt).getHours() < 18 ? 'Día' : 'Noche') : 'Día',
+          siloLoad: row(2),
+          siloOut: row(12)
+        }),
         sourceLabel: 'Carga masiva'
       });
     });
@@ -976,16 +1022,7 @@ function renderStopJustifications() {
   }
 
   function bulkRecordSignature(rec) {
-    return [
-      safe(rec.date || '').slice(0, 10),
-      safe(rec.loadAt || rec.createdAt || ''),
-      safe(rec.dryer || ''),
-      normalizeUser(rec.user || rec.username || ''),
-      String(Number(rec.secadas) || 0),
-      safe(rec.siloLoad || ''),
-      safe(rec.siloOut || ''),
-      safe(rec.sourceLabel || rec.source || '')
-    ].join('|');
+    return recordFingerprint(rec);
   }
 
   async function bulkImport() {
