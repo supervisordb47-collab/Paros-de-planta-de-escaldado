@@ -391,6 +391,28 @@
   ],
   "notifications": [
     {
+      "id": "notif_ijov3ea8nn80",
+      "title": "Sin ingreso en turno Noche",
+      "message": "Han pasado más de 12 horas desde el último registro del turno Noche.",
+      "type": "warning",
+      "scope": "shift",
+      "createdAt": "2026-03-28T12:44:04.560Z",
+      "readBy": [
+        "ADMIN"
+      ],
+      "source": "system"
+    },
+    {
+      "id": "notif_l1o0zsqvnn7r",
+      "title": "Sin ingreso en turno Día",
+      "message": "Han pasado más de 12 horas desde el último registro del turno Día.",
+      "type": "warning",
+      "scope": "shift",
+      "createdAt": "2026-03-28T12:44:04.551Z",
+      "readBy": [],
+      "source": "system"
+    },
+    {
       "id": "notif_yn3qv2qkjcev",
       "title": "Nuevo registro",
       "message": "Administrador registró 1 secadas en turno Noche (2026-03-25).",
@@ -637,12 +659,12 @@
   ],
   "meta": {
     "notificationState": {
-      "DAY": null,
-      "NIGHT": null
+      "DAY": "rec_6td6ebpwftuf_12",
+      "NIGHT": "rec_n5hwfg8kjcev_12"
     },
     "github": {
       "sha": null,
-      "syncedAt": "2026-03-28T00:06:20.764Z"
+      "syncedAt": "2026-03-28T12:44:04.544Z"
     }
   }
 }
