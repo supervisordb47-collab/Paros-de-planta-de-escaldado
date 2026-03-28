@@ -7,6 +7,8 @@
     "alertHours": 12,
     "totalDryers": 3,
     "theme": "blue",
+    "whatsappNumber": "+50488305122",
+    "whatsappMessage": "Hola, necesito apoyo con el portal de secadas.",
     "github": {
       "owner": "supervisordb47-collab",
       "repo": "Paros-de-planta-de-escaldado",
@@ -14,8 +16,6 @@
       "path": "portal-data.json",
       "autoSync": true
     },
-    "whatsappNumber": "+50488305122",
-    "whatsappMessage": "Hola, necesito apoyo con el portal de secadas.",
     "githubSync": {
       "enabled": true,
       "owner": "supervisordb47-collab",
@@ -71,7 +71,8 @@
       "notes": "",
       "createdAt": "2026-03-28T13:46:59.111Z",
       "updatedAt": "2026-03-28T13:46:59.111Z",
-      "recordKey": "2026-03-27|2026-03-28t13:46:59.111z||2|admin|||1|07|15|0|||noche"
+      "recordKey": "2026-03-27|2026-03-28t13:46:59.111z||2|admin|||1|07|15|0|||noche",
+      "fingerprint": "COMP|2026-03-27|2||||"
     },
     {
       "id": "rec_p5vpuf61t3zd",
@@ -89,7 +90,8 @@
       "notes": "",
       "createdAt": "2026-03-28T13:44:18.793Z",
       "updatedAt": "2026-03-28T13:44:18.793Z",
-      "recordKey": "2026-03-27|2026-03-28t13:44:18.793z||3|admin|||1|06|30|0|||día"
+      "recordKey": "2026-03-27|2026-03-28t13:44:18.793z||3|admin|||1|06|30|0|||día",
+      "fingerprint": "COMP|2026-03-27|3||||"
     },
     {
       "id": "rec_1rojcfzeri9k",
@@ -107,7 +109,8 @@
       "notes": "",
       "createdAt": "2026-03-28T13:43:03.992Z",
       "updatedAt": "2026-03-28T13:43:03.992Z",
-      "recordKey": "2026-03-27|2026-03-28t13:43:03.992z||2|admin|||1|07|30|0|||día"
+      "recordKey": "2026-03-27|2026-03-28t13:43:03.992z||2|admin|||1|07|30|0|||día",
+      "fingerprint": "COMP|2026-03-27|2||||"
     },
     {
       "id": "rec_n5hwfg8kjcev",
@@ -125,7 +128,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:08:55.063Z",
       "updatedAt": "2026-03-27T23:08:55.063Z",
-      "recordKey": "2026-03-25|2026-03-27t23:08:55.063z||2|admin|||1|07|15|0|||noche"
+      "recordKey": "2026-03-25|2026-03-27t23:08:55.063z||2|admin|||1|07|15|0|||noche",
+      "fingerprint": "COMP|2026-03-25|2||||"
     },
     {
       "id": "rec_sibidzxbhkx7",
@@ -143,7 +147,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:07:32.779Z",
       "updatedAt": "2026-03-27T23:07:32.779Z",
-      "recordKey": "2026-03-25|2026-03-27t23:07:32.779z||2|admin|||1|06|45|0|||noche"
+      "recordKey": "2026-03-25|2026-03-27t23:07:32.779z||2|admin|||1|06|45|0|||noche",
+      "fingerprint": "COMP|2026-03-25|2||||"
     },
     {
       "id": "rec_6td6ebpwftuf",
@@ -161,7 +166,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:06:11.031Z",
       "updatedAt": "2026-03-27T23:06:11.031Z",
-      "recordKey": "2026-03-26|2026-03-27t23:06:11.031z||3|admin|||1|07|30|0|||día"
+      "recordKey": "2026-03-26|2026-03-27t23:06:11.031z||3|admin|||1|07|30|0|||día",
+      "fingerprint": "COMP|2026-03-26|3||||"
     },
     {
       "id": "rec_bd8t3jwmeg88",
@@ -179,7 +185,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:05:06.728Z",
       "updatedAt": "2026-03-27T23:05:06.728Z",
-      "recordKey": "2026-03-26|2026-03-27t23:05:06.728z||3|admin|||1|07|15|0|||noche"
+      "recordKey": "2026-03-26|2026-03-27t23:05:06.728z||3|admin|||1|07|15|0|||noche",
+      "fingerprint": "COMP|2026-03-26|3||||"
     },
     {
       "id": "rec_euligxi3e0xe",
@@ -197,7 +204,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:04:46.899Z",
       "updatedAt": "2026-03-27T23:04:46.899Z",
-      "recordKey": "2026-03-26|2026-03-27t23:04:46.899z||2|admin|||1|06|15|0|||noche"
+      "recordKey": "2026-03-26|2026-03-27t23:04:46.899z||2|admin|||1|06|15|0|||noche",
+      "fingerprint": "COMP|2026-03-26|2||||"
     },
     {
       "id": "rec_ycavpohxc51w",
@@ -215,7 +223,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:03:18.932Z",
       "updatedAt": "2026-03-27T23:03:18.932Z",
-      "recordKey": "2026-03-25|2026-03-27t23:03:18.932z||2|admin|||1|07|15|0|||noche"
+      "recordKey": "2026-03-25|2026-03-27t23:03:18.932z||2|admin|||1|07|15|0|||noche",
+      "fingerprint": "COMP|2026-03-25|2||||"
     },
     {
       "id": "rec_jr9wegonbmdz",
@@ -233,7 +242,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:02:54.743Z",
       "updatedAt": "2026-03-27T23:02:54.743Z",
-      "recordKey": "2026-03-25|2026-03-27t23:02:54.743z||3|admin|||1|06|30|0|||día"
+      "recordKey": "2026-03-25|2026-03-27t23:02:54.743z||3|admin|||1|06|30|0|||día",
+      "fingerprint": "COMP|2026-03-25|3||||"
     },
     {
       "id": "rec_9y071u0ob9u8",
@@ -251,7 +261,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:02:38.480Z",
       "updatedAt": "2026-03-27T23:02:38.480Z",
-      "recordKey": "2026-03-25|2026-03-27t23:02:38.480z||2|admin|||1|06|30|0|||día"
+      "recordKey": "2026-03-25|2026-03-27t23:02:38.480z||2|admin|||1|06|30|0|||día",
+      "fingerprint": "COMP|2026-03-25|2||||"
     },
     {
       "id": "rec_8kqtqth3ae5i",
@@ -269,7 +280,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:01:57.414Z",
       "updatedAt": "2026-03-27T23:01:57.414Z",
-      "recordKey": "2026-03-24|2026-03-27t23:01:57.414z||3|admin|||1|07|00|0|||noche"
+      "recordKey": "2026-03-24|2026-03-27t23:01:57.414z||3|admin|||1|07|00|0|||noche",
+      "fingerprint": "COMP|2026-03-24|3||||"
     },
     {
       "id": "rec_m50qly64a1ep",
@@ -287,7 +299,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:01:40.897Z",
       "updatedAt": "2026-03-27T23:01:40.897Z",
-      "recordKey": "2026-03-24|2026-03-27t23:01:40.897z||2|admin|||1|06|45|0|||noche"
+      "recordKey": "2026-03-24|2026-03-27t23:01:40.897z||2|admin|||1|06|45|0|||noche",
+      "fingerprint": "COMP|2026-03-24|2||||"
     },
     {
       "id": "rec_cbofhkwj88uz",
@@ -305,7 +318,8 @@
       "notes": "",
       "createdAt": "2026-03-27T23:00:17.243Z",
       "updatedAt": "2026-03-27T23:00:17.243Z",
-      "recordKey": "2026-03-23|2026-03-27t23:00:17.243z||2|admin|||1|06|45|0|||día"
+      "recordKey": "2026-03-23|2026-03-27t23:00:17.243z||2|admin|||1|06|45|0|||día",
+      "fingerprint": "COMP|2026-03-23|2||||"
     },
     {
       "id": "rec_h74drqka5fye",
@@ -323,7 +337,8 @@
       "notes": "",
       "createdAt": "2026-03-27T22:58:06.470Z",
       "updatedAt": "2026-03-27T22:58:06.470Z",
-      "recordKey": "2026-03-23|2026-03-27t22:58:06.470z||3|admin|||0|||12|carga|falta de carga por falta de materia prima leitada; no se contaba con granza mojada.|noche"
+      "recordKey": "2026-03-23|2026-03-27t22:58:06.470z||3|admin|||0|||12|carga|falta de carga por falta de materia prima leitada; no se contaba con granza mojada.|noche",
+      "fingerprint": "STOP|2026-03-23|3|12|CARGA"
     },
     {
       "id": "rec_dwh87ktl4aer",
@@ -341,7 +356,8 @@
       "notes": "",
       "createdAt": "2026-03-27T22:57:12.627Z",
       "updatedAt": "2026-03-27T22:57:12.627Z",
-      "recordKey": "2026-03-23|2026-03-27t22:57:12.627z||2|admin|||1|07|30|0|||noche"
+      "recordKey": "2026-03-23|2026-03-27t22:57:12.627z||2|admin|||1|07|30|0|||noche",
+      "fingerprint": "COMP|2026-03-23|2||||"
     },
     {
       "id": "rec_hp8q7zfl1g6o",
@@ -359,7 +375,8 @@
       "notes": "",
       "createdAt": "2026-03-27T22:55:00.144Z",
       "updatedAt": "2026-03-27T22:55:00.144Z",
-      "recordKey": "2026-03-23|2026-03-27t22:55:00.144z||3|admin|||1|06|45|0|||día"
+      "recordKey": "2026-03-23|2026-03-27t22:55:00.144z||3|admin|||1|06|45|0|||día",
+      "fingerprint": "COMP|2026-03-23|3||||"
     },
     {
       "id": "rec_ilv89gi6y3ed",
@@ -377,7 +394,8 @@
       "notes": "",
       "createdAt": "2026-03-27T22:52:23.605Z",
       "updatedAt": "2026-03-27T22:52:23.605Z",
-      "recordKey": "2026-03-26|2026-03-27t22:52:23.605z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día"
+      "recordKey": "2026-03-26|2026-03-27t22:52:23.605z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día",
+      "fingerprint": "STOP|2026-03-26|1|12|MECANICO"
     },
     {
       "id": "rec_ero203boxoe9",
@@ -395,7 +413,8 @@
       "notes": "",
       "createdAt": "2026-03-27T22:52:04.161Z",
       "updatedAt": "2026-03-27T22:52:04.161Z",
-      "recordKey": "2026-03-25|2026-03-27t22:52:04.161z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|noche"
+      "recordKey": "2026-03-25|2026-03-27t22:52:04.161z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|noche",
+      "fingerprint": "STOP|2026-03-25|1|12|MECANICO"
     },
     {
       "id": "rec_czq2epcywqgh",
@@ -413,7 +432,8 @@
       "notes": "",
       "createdAt": "2026-03-27T22:51:20.177Z",
       "updatedAt": "2026-03-27T22:51:20.177Z",
-      "recordKey": "2026-03-24|2026-03-27t22:51:20.177z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día"
+      "recordKey": "2026-03-24|2026-03-27t22:51:20.177z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día",
+      "fingerprint": "STOP|2026-03-24|1|12|MECANICO"
     },
     {
       "id": "rec_7vk8pltcwbn0",
@@ -431,7 +451,8 @@
       "notes": "",
       "createdAt": "2026-03-27T22:51:00.972Z",
       "updatedAt": "2026-03-27T22:51:00.972Z",
-      "recordKey": "2026-03-23|2026-03-27t22:51:00.972z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|noche"
+      "recordKey": "2026-03-23|2026-03-27t22:51:00.972z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|noche",
+      "fingerprint": "STOP|2026-03-23|1|12|MECANICO"
     },
     {
       "id": "rec_issaplyxvp0j",
@@ -449,7 +470,8 @@
       "notes": "",
       "createdAt": "2026-03-27T22:50:31.651Z",
       "updatedAt": "2026-03-27T22:50:31.651Z",
-      "recordKey": "2026-03-23|2026-03-27t22:50:31.651z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día"
+      "recordKey": "2026-03-23|2026-03-27t22:50:31.651z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día",
+      "fingerprint": "STOP|2026-03-23|1|12|MECANICO"
     },
     {
       "id": "rec_4lbe3hhh9vak",
@@ -467,7 +489,8 @@
       "notes": "",
       "createdAt": "2026-03-27T21:09:34.508Z",
       "updatedAt": "2026-03-27T21:09:34.508Z",
-      "recordKey": "2026-03-27|2026-03-27t21:09:34.508z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día"
+      "recordKey": "2026-03-27|2026-03-27t21:09:34.508z||1|admin|||0|||12|mecanico|la banda de cangilones del elevador #6 no está soportando el flujo de granza, por lo que no se ha podido cargar ni descargar la secadora 1.|día",
+      "fingerprint": "STOP|2026-03-27|1|12|MECANICO"
     }
   ],
   "notifications": [
