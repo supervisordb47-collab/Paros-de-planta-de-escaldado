@@ -36,7 +36,7 @@
       </div>
 
       <div class="login-note">
-        Ingresa tus credenciales para acceder al portal. Puedes sincronizar la base con GitHub y compartir alertas por WhatsApp.
+        Ingresa tus credenciales para acceder al portal.
       </div>
     </div>
   </div>
@@ -92,7 +92,6 @@
           <div class="eyebrow" id="topbarEyebrow">Sistema portable de secadas</div>
           <h2 id="topbarTitle">Tablero ejecutivo</h2>
           <p id="topbarText">Registros, notificaciones, gráficos y control por usuario.</p>
-          <span id="syncBadge" class="pill sync-pill">Pendiente de sync</span>
         </div>
 
         <div class="topbar-actions">
@@ -113,12 +112,7 @@
             </div>
           </div>
           <button id="refreshBtn" class="btn soft">Actualizar</button>
-          <button id="whatsAppBtn" class="btn soft wa-btn" type="button" aria-label="Compartir por WhatsApp">
-            <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" focusable="false">
-              <path fill="currentColor" d="M12.04 2C6.5 2 2 6.48 2 11.99c0 1.77.47 3.46 1.34 4.96L2 22l5.2-1.32a9.93 9.93 0 0 0 4.84 1.24h.01C17.53 21.92 22 17.44 22 11.99 22 6.48 17.55 2 12.04 2zm5.84 14.29c-.24.67-1.4 1.28-1.92 1.36-.49.07-1.1.1-1.78-.11-.41-.13-.94-.31-1.62-.6-2.86-1.23-4.73-4.12-4.88-4.31-.14-.2-1.16-1.54-1.16-2.94 0-1.4.73-2.08 1-2.37.24-.24.64-.35 1.02-.35.12 0 .22 0 .32.01.29.01.44.03.63.5.24.58.82 2 .89 2.14.07.14.12.31.02.5-.1.2-.15.32-.29.49-.15.18-.31.4-.45.54-.15.15-.31.31-.13.62.18.31.8 1.32 1.72 2.14 1.18 1.05 2.17 1.38 2.48 1.52.31.13.49.11.68-.07.19-.19.82-.95 1.04-1.28.22-.33.44-.28.74-.17.3.1 1.9.9 2.23 1.06.33.16.54.24.62.37.08.13.08.74-.16 1.41z"/>
-            </svg>
-            WhatsApp
-          </button>
+          <button id="whatsappQuickBtn" class="btn ghost">WhatsApp</button>
         </div>
       </header>
 
@@ -207,6 +201,26 @@
           <section class="card">
             <div class="card-head"><h3>Actividad reciente</h3><span class="pill">Eventos</span></div>
             <div id="recentActivity" class="stack"></div>
+          </section>
+        </div>
+
+        <div class="two-col" style="margin-top:16px">
+          <section class="card">
+            <div class="card-head">
+              <h3>Cuadro de secadas por periodo</h3>
+              <span class="pill">Día / Semana / Mes</span>
+            </div>
+            <div id="periodBreakdown" class="period-grid"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Leyenda del paro</h3>
+              <span class="pill">Justificación real</span>
+            </div>
+            <div id="stopLegend" class="legend-grid"></div>
+            <div class="divider"></div>
+            <div id="stopJustifications" class="stack"></div>
           </section>
         </div>
       </section>
@@ -399,27 +413,6 @@
             </div>
             <div id="quickPeriodStats" class="stack"></div>
           </section>
-
-          <section class="card">
-            <div class="card-head">
-              <h3>Leyenda del paro</h3>
-              <span class="pill">Explica el porqué</span>
-            </div>
-            <div class="stack">
-              <div class="stop-item">
-                <div class="stop-title">Cuando secadas = 0</div>
-                <div class="stop-meta">El sistema abre el bloque de paro y exige una descripción del motivo principal.</div>
-              </div>
-              <div class="stop-item">
-                <div class="stop-title">Tipos más comunes</div>
-                <div class="stop-meta">Mecánico, eléctrico, motor, bomba, falta de carga o programado.</div>
-              </div>
-              <div class="stop-item">
-                <div class="stop-title">Qué se debe escribir</div>
-                <div class="stop-meta">Describe la causa real, el efecto sobre la secadora y la acción tomada para corregirlo.</div>
-              </div>
-            </div>
-          </section>
         </div>
       </section>
 
@@ -500,6 +493,63 @@
             <span class="pill">Editable por admin</span>
           </div>
 
+
+          <section class="card sync-card" style="margin-top:16px">
+            <div class="card-head">
+              <h3>Sincronización GitHub</h3>
+              <span id="githubSyncBadge" class="pill">Desconectado</span>
+            </div>
+            <div class="two-col">
+              <label class="field">
+                <span>Owner</span>
+                <input id="githubOwner" class="big-input" placeholder="usuario-github" />
+              </label>
+              <label class="field">
+                <span>Repositorio</span>
+                <input id="githubRepo" class="big-input" placeholder="portal-secadas" />
+              </label>
+            </div>
+            <div class="two-col">
+              <label class="field">
+                <span>Branch</span>
+                <input id="githubBranch" class="big-input" placeholder="main" />
+              </label>
+              <label class="field">
+                <span>Archivo JSON</span>
+                <input id="githubPath" class="big-input" placeholder="portal-data.json" />
+              </label>
+            </div>
+            <div class="two-col">
+              <label class="field">
+                <span>Token GitHub (solo esta sesión)</span>
+                <input id="githubToken" class="big-input" type="password" placeholder="github_pat_..." />
+              </label>
+              <label class="field">
+                <span>Actualización automática</span>
+                <select id="githubAutoSync" class="big-select">
+                  <option value="true">Activada</option>
+                  <option value="false">Desactivada</option>
+                </select>
+              </label>
+            </div>
+            <div class="two-col">
+              <label class="field">
+                <span>WhatsApp</span>
+                <input id="whatsappNumber" class="big-input" placeholder="5210000000000" />
+              </label>
+              <label class="field">
+                <span>Mensaje WhatsApp</span>
+                <input id="whatsappMessage" class="big-input" placeholder="Hola, necesito ayuda con el portal." />
+              </label>
+            </div>
+            <div class="form-actions">
+              <button id="saveSyncBtn" class="btn primary">Guardar y sincronizar</button>
+              <button id="syncNowBtn" class="btn soft">Sincronizar ahora</button>
+              <button id="githubPullBtn" class="btn ghost">Traer nube</button>
+            </div>
+            <div id="githubSyncStatus" class="sync-status">Sincronización no configurada.</div>
+          </section>
+
           <div class="two-col">
             <div class="record-form">
               <label class="field">
@@ -535,56 +585,8 @@
                   </select>
                 </label>
               </div>
-              <div class="card inner-card">
-                <div class="soft-title">Sincronización con GitHub</div>
-                <div class="row2">
-                  <label class="field">
-                    <span>Activar nube</span>
-                    <select id="settingGitHubEnabled" class="big-select">
-                      <option value="false">Desactivado</option>
-                      <option value="true">Activado</option>
-                    </select>
-                  </label>
-                  <label class="field">
-                    <span>Branch</span>
-                    <input id="settingGitHubBranch" class="big-input" placeholder="main" />
-                  </label>
-                </div>
-                <div class="row2">
-                  <label class="field">
-                    <span>Owner</span>
-                    <input id="settingGitHubOwner" class="big-input" placeholder="usuario-o-org" />
-                  </label>
-                  <label class="field">
-                    <span>Repositorio</span>
-                    <input id="settingGitHubRepo" class="big-input" placeholder="repositorio" />
-                  </label>
-                </div>
-                <div class="row2">
-                  <label class="field">
-                    <span>Archivo JSON</span>
-                    <input id="settingGitHubPath" class="big-input" placeholder="portal-data.json" />
-                  </label>
-                  <label class="field">
-                    <span>Token GitHub (solo sesión)</span>
-                    <input id="settingGitHubToken" class="big-input" type="password" placeholder="Token con permiso de contents" />
-                  </label>
-                </div>
-                <div class="row2">
-                  <label class="field">
-                    <span>Número WhatsApp</span>
-                    <input id="settingWhatsappNumber" class="big-input" placeholder="+50400000000" />
-                  </label>
-                  <label class="field">
-                    <span>Mensaje WhatsApp</span>
-                    <input id="settingWhatsappMessage" class="big-input" placeholder="Hola, comparto el estado del portal de secadas." />
-                  </label>
-                </div>
-                <p class="note-sync">La nube usa la API de GitHub Contents. El token se guarda solo en esta sesión, así que conviene usar uno de alcance mínimo.</p>
-              </div>
               <div class="form-actions">
                 <button id="saveSettingsBtn" class="btn primary">Guardar configuración</button>
-                <button id="syncNowBtn" class="btn soft">Sincronizar ahora</button>
                 <button id="resetSettingsBtn" class="btn soft">Restaurar ajustes</button>
               </div>
             </div>
@@ -611,14 +613,15 @@
           <div class="backup-box">
             <div class="backup-card">
               <h4>Exportar todo</h4>
-              <p>Descarga usuarios, registros, notificaciones y configuración en un solo archivo como respaldo extra.</p>
+              <p>Descarga usuarios, registros, notificaciones y configuración en un solo archivo.</p>
               <button id="exportJsonBtn" class="btn primary">Exportar JSON</button>
             </div>
             <div class="backup-card">
               <h4>Importar respaldo</h4>
-              <p>Sube un JSON compatible para restaurar todo el sistema.</p>
+              <p>Sube un JSON compatible para restaurar todo el sistema o combinar históricos.</p>
               <input id="importJsonInput" type="file" accept="application/json" hidden />
               <button id="importJsonBtn" class="btn soft">Importar JSON</button>
+              <button id="importJsonMergeBtn" class="btn ghost" style="margin-top:10px">Combinar historial</button>
             </div>
             <div class="backup-card">
               <h4>Exportar CSV</h4>
