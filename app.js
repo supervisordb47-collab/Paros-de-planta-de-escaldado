@@ -1,6 +1,7 @@
 (() => {
   const STORAGE_KEY = 'secadas_portal_state_v1';
   const SESSION_KEY = 'secadas_portal_session_v1';
+  const GITHUB_TOKEN_KEY = 'secadas_portal_github_token_v1';
 
   const $ = (id) => document.getElementById(id);
 
@@ -78,6 +79,117 @@
     return d.toISOString().slice(0, 10);
   }
 
+  function isoWeekNumber(dateStr = todayISO()) {
+    const d = new Date(`${dateStr}T00:00:00`);
+    if (Number.isNaN(d.getTime())) return 0;
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+    const week1 = new Date(d.getFullYear(), 0, 4);
+    return 1 + Math.round((((d - week1) / 86400000) - 3 + ((week1.getDay() + 6) % 7)) / 7);
+  }
+
+  function weekLabel(dateStr = todayISO()) {
+    return `Semana ${isoWeekNumber(dateStr)}`;
+  }
+
+  function minutesFromRecord(r) {
+    if (!r || Number(r.secadas) <= 0) return 0;
+    return (toNumber(r.durationHours, 0) * 60) + toNumber(r.durationMinutes, 0);
+  }
+
+  function formatMinutes(totalMinutes = 0) {
+    const mins = Math.max(0, Math.round(totalMinutes));
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
+  function makeRecordFingerprint(rec) {
+    return [
+      rec.date || '', rec.shift || '', rec.dryer || '', String(rec.secadas ?? ''),
+      rec.loadAt || '', rec.unloadAt || '', rec.siloLoad || '', rec.siloOut || '',
+      rec.user || '', rec.stopType || '', rec.mainStop || ''
+    ].map(v => safe(v).toUpperCase()).join('|');
+  }
+
+  function normalizeStateRecords(records = []) {
+    return records.map(rec => ({
+      ...rec,
+      fingerprint: rec.fingerprint || makeRecordFingerprint(rec)
+    }));
+  }
+
+  function weekSummaryForOffset(offsetWeeks = 0, records = getRecordsVisible()) {
+    const base = new Date(`${todayISO()}T00:00:00`);
+    base.setDate(base.getDate() - (offsetWeeks * 7));
+    const start = weekStartKey(base.toISOString().slice(0, 10));
+    const endDate = new Date(`${start}T00:00:00`);
+    endDate.setDate(endDate.getDate() + 6);
+    const end = endDate.toISOString().slice(0, 10);
+    const weekRecords = completedRecords(records).filter(r => inRange((r.date || '').slice(0, 10), start, end));
+    const total = sum(weekRecords.map(r => toNumber(r.secadas)));
+    const avgPerRecord = weekRecords.length ? total / weekRecords.length : 0;
+    const avgMinutes = weekRecords.length ? weekRecords.reduce((acc, r) => acc + minutesFromRecord(r), 0) / weekRecords.length : 0;
+    const byDryer = {};
+    weekRecords.forEach(r => {
+      const key = String(r.dryer || '—');
+      if (!byDryer[key]) byDryer[key] = { secadas: 0, count: 0, minutes: [] };
+      byDryer[key].secadas += toNumber(r.secadas);
+      byDryer[key].count += 1;
+      byDryer[key].minutes.push(minutesFromRecord(r));
+    });
+    return { start, end, total, count: weekRecords.length, avgPerRecord, avgMinutes, byDryer, weekRecords };
+  }
+
+  function forecastWeeklyValue() {
+    const series = [3, 2, 1, 0].map(i => weekSummaryForOffset(i).total).reverse();
+    const diffs = [];
+    for (let i = 1; i < series.length; i++) diffs.push(series[i] - series[i - 1]);
+    const avgDiff = diffs.length ? diffs.reduce((a, b) => a + b, 0) / diffs.length : 0;
+    return Math.max(0, Math.round(series[series.length - 1] + avgDiff));
+  }
+
+  function weeklyComparisonData() {
+    const current = weekSummaryForOffset(0);
+    const previous = weekSummaryForOffset(1);
+    const ante = weekSummaryForOffset(2);
+    const forecast = forecastWeeklyValue();
+    return { current, previous, ante, forecast };
+  }
+
+  function weeklyForecastSeries() {
+    const data = weeklyComparisonData();
+    return {
+      labels: [weekLabel(data.ante.start), weekLabel(data.previous.start), weekLabel(data.current.start), 'Pronóstico'],
+      values: [data.ante.total, data.previous.total, data.current.total, data.forecast]
+    };
+  }
+
+  function dryerConsolidatedData(records = getRecordsVisible()) {
+    const dryers = Math.max(1, parseIntMaybe(state.settings.totalDryers) || 3);
+    const currentWeek = weekSummaryForOffset(0, records).weekRecords;
+    const monthKey = todayISO().slice(0, 7);
+    const monthRecords = completedRecords(records).filter(r => (r.date || '').slice(0, 7) === monthKey);
+    const todayKey = todayISO();
+    const todayRecords = completedRecords(records).filter(r => (r.date || '').slice(0, 10) === todayKey);
+    const out = [];
+    for (let i = 1; i <= dryers; i++) {
+      const w = currentWeek.filter(r => String(r.dryer) === String(i));
+      const m = monthRecords.filter(r => String(r.dryer) === String(i));
+      const t = todayRecords.filter(r => String(r.dryer) === String(i));
+      const avgMins = w.length ? w.reduce((acc, r) => acc + minutesFromRecord(r), 0) / w.length : 0;
+      out.push({
+        dryer: i,
+        today: sum(t.map(r => toNumber(r.secadas))),
+        week: sum(w.map(r => toNumber(r.secadas))),
+        month: sum(m.map(r => toNumber(r.secadas))),
+        avgMinutes: avgMins,
+        stops: records.filter(r => String(r.dryer) === String(i) && Number(r.secadas) === 0).length
+      });
+    }
+    return out;
+  }
+
   function inRange(dateStr, startKey, endKey) {
     return !!dateStr && dateStr >= startKey && dateStr <= endKey;
   }
@@ -132,35 +244,36 @@
     return out;
   }
 
-function loadState() {
-  const base = defaultState();
-  const initial = clone(base);
-  initial.settings.github = {
-    ...(base.settings.github || {}),
-    ...(initial.settings.github || {})
-  };
-  return initial;
-}
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return defaultState();
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return defaultState();
+      parsed.settings = { ...defaultState().settings, ...(parsed.settings || {}) };
+      parsed.settings.github = { ...defaultState().settings.github, ...(parsed.settings.github || {}) };
+      parsed.users = normalizeUsers(parsed.users || defaultState().users);
+      parsed.records = normalizeStateRecords(Array.isArray(parsed.records) ? parsed.records : []);
+      parsed.notifications = Array.isArray(parsed.notifications) ? parsed.notifications : [];
+      parsed.meta = parsed.meta || defaultState().meta;
+      parsed.meta.notificationState = parsed.meta.notificationState || { DAY: null, NIGHT: null };
+      return parsed;
+    } catch {
+      return defaultState();
+    }
+  }
 
-function saveState() {
-  state.meta = state.meta || {};
-  state.meta.updatedAt = nowISO();
-  requestSync('state-change');
-}
+  function saveState(syncCloud = true) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (syncCloud) queueCloudSync();
+  }
 
   let state = loadState();
   let session = null;
   let editingRecordId = null;
   let notificationTimer = null;
-  const SYNC_TOKEN_KEY = 'secadas_portal_github_token_v1';
-  let syncTimer = null;
-  let pullTimer = null;
-  let syncInFlight = false;
-  let syncStatus = {
-    mode: 'offline',
-    title: 'Sincronización no configurada',
-    detail: 'Completa GitHub en Configuración para activar la nube.'
-  };
+  let cloudSyncTimer = null;
+  let cloudBusy = false;
 
   function currentUser() {
     const username = session?.username ? normalizeUser(session.username) : null;
@@ -170,9 +283,10 @@ function saveState() {
     return currentUser()?.role === 'admin';
   }
   function canEditRecord(record) {
-    if (isAdmin()) return true;
-    const user = currentUser();
-    return !!user && record && record.user === user.username;
+    return !!currentUser() && !!record;
+  }
+  function canDeleteRecord(record) {
+    return isAdmin() && !!record;
   }
 
   function showToast(title, message = '') {
@@ -184,537 +298,164 @@ function saveState() {
     showToast._t = setTimeout(() => box.classList.remove('show'), 3200);
   }
 
-function loadSession() {
-  try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
-    session = raw ? JSON.parse(raw) : null;
-    if (session?.username) session.username = normalizeUser(session.username);
-  } catch {
-    session = null;
+  function loadSession() {
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      session = raw ? JSON.parse(raw) : null;
+      if (session?.username) session.username = normalizeUser(session.username);
+    } catch {
+      session = null;
+    }
   }
-}
 
-function saveSession() {
-  try {
-    if (!session) sessionStorage.removeItem(SESSION_KEY);
-    else sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
-  } catch {
-    // ignore session storage errors
+  function saveSession() {
+    if (!session) localStorage.removeItem(SESSION_KEY);
+    else localStorage.setItem(SESSION_KEY, JSON.stringify(session));
   }
-}
 
-
-function loadStoredGithubToken() {
-  try {
-    return sessionStorage.getItem(SYNC_TOKEN_KEY) || '';
-  } catch {
-    return '';
-  }
-}
-
-function saveStoredGithubToken(token) {
-  try {
-    if (!token) sessionStorage.removeItem(SYNC_TOKEN_KEY);
-    else sessionStorage.setItem(SYNC_TOKEN_KEY, token);
-  } catch {
-    // ignore session storage errors
-  }
-}
-
-function encodeBase64Utf8(value) {
-  return btoa(unescape(encodeURIComponent(String(value ?? ''))));
-}
-
-function decodeBase64Utf8(value) {
-  return decodeURIComponent(escape(atob(String(value ?? '').replace(/\s+/g, ''))));
-}
-
-function githubPathEncode(path) {
-  return String(path || '')
-    .split('/')
-    .filter(Boolean)
-    .map(encodeURIComponent)
-    .join('/');
-}
-
-function detectedGithubConfig() {
-  const host = location.hostname || '';
-  if (!host.endsWith('github.io')) {
-    return { owner: '', repo: '' };
-  }
-  const owner = host.split('.')[0];
-  const repo = (location.pathname || '').split('/').filter(Boolean)[0] || '';
-  return {
-    owner,
-    repo,
-    branch: 'main',
-    path: 'portal-data.json',
-    autoSync: true
-  };
-}
-
-function ensureGithubDefaults() {
-  const detected = detectedGithubConfig();
-  state.settings.github = {
-    owner: '',
-    repo: '',
-    branch: 'main',
-    path: 'portal-data.json',
-    autoSync: true,
-    ...(state.settings.github || {}),
-    ...(detected.owner && !safe(state.settings.github?.owner) ? { owner: detected.owner } : {}),
-    ...(detected.repo && !safe(state.settings.github?.repo) ? { repo: detected.repo } : {})
-  };
-  state.settings.whatsappNumber = safe(state.settings.whatsappNumber || '');
-  state.settings.whatsappMessage = safe(state.settings.whatsappMessage || 'Hola, necesito ayuda con el portal de secadas.');
-}
-
-function githubConfig() {
-  ensureGithubDefaults();
-  const g = state.settings.github || {};
-  return {
-    owner: safe(g.owner),
-    repo: safe(g.repo),
-    branch: safe(g.branch) || 'main',
-    path: safe(g.path) || 'portal-data.json',
-    autoSync: g.autoSync !== false
-  };
-}
-
-function hasGithubConfig() {
-  const cfg = githubConfig();
-  return !!(cfg.owner && cfg.repo && cfg.path);
-}
-
-function setSyncStatus(mode, title, detail = '') {
-  syncStatus = { mode, title, detail };
-  renderSyncStatus();
-}
-
-function renderSyncStatus() {
-  const badge = $('githubSyncBadge');
-  const box = $('githubSyncStatus');
-  if (badge) {
-    const map = {
-      offline: 'Desconectado',
-      syncing: 'Sincronizando',
-      ok: 'Sincronizado',
-      warn: 'Atención',
-      error: 'Error'
+  function githubConfig() {
+    const cfg = state.settings.github || {};
+    const token = sessionStorage.getItem(GITHUB_TOKEN_KEY) || '';
+    return {
+      owner: safe(cfg.owner),
+      repo: safe(cfg.repo),
+      branch: safe(cfg.branch) || 'main',
+      path: safe(cfg.path) || 'portal-data.json',
+      token: safe(token)
     };
-    badge.textContent = map[syncStatus.mode] || 'Sincronizado';
-    badge.className = `pill sync-pill ${syncStatus.mode}`;
   }
-  if (box) {
-    box.innerHTML = `
-      <strong>${escapeHtml(syncStatus.title || '')}</strong>
-      ${syncStatus.detail ? `<span>${escapeHtml(syncStatus.detail)}</span>` : ''}
-    `;
+
+  function hasGithubConfig() {
+    const cfg = githubConfig();
+    return !!(cfg.owner && cfg.repo && cfg.branch && cfg.path && cfg.token);
   }
-}
 
-function normalizeRecordItem(rec) {
-  if (!rec || typeof rec !== 'object') return null;
-  const secadas = toNumber(rec.secadas);
-  const normalized = {
-    ...rec,
-    id: safe(rec.id) || uid('rec'),
-    user: normalizeUser(rec.user || rec.username || 'ADMIN'),
-    fullName: safe(rec.fullName || rec.name || rec.user || rec.username || 'ADMIN'),
-    date: safe(rec.date || '').slice(0, 10),
-    shift: rec.shift || 'Día',
-    dryer: String(rec.dryer || '1'),
-    secadas,
-    durationHours: secadas > 0 ? (rec.durationHours ?? null) : null,
-    durationMinutes: secadas > 0 ? (rec.durationMinutes ?? null) : null,
-    stopHours: secadas === 0 ? toNumber(rec.stopHours, 0) : 0,
-    stopType: secadas === 0 ? safe(rec.stopType) : '',
-    mainStop: secadas === 0 ? safe(rec.mainStop) : '',
-    notes: safe(rec.notes),
-    createdAt: rec.createdAt || nowISO(),
-    updatedAt: rec.updatedAt || nowISO()
-  };
-  if (!normalized.date) normalized.date = isoToDateKey(normalized.createdAt) || todayISO();
-  normalized.recordKey = safe(rec.recordKey) || recordFingerprint({
-    ...normalized,
-    loadAt: rec.loadAt || normalized.createdAt,
-    unloadAt: rec.unloadAt || '',
-    shift: normalized.shift
-  });
-  return normalized;
-}
+  function encodeUtf8Base64(text) {
+    try {
+      return btoa(unescape(encodeURIComponent(String(text))));
+    } catch {
+      return btoa(String(text || ''));
+    }
+  }
 
-function normalizeNotificationItem(item) {
-  if (!item || typeof item !== 'object') return null;
-  return {
-    ...item,
-    id: safe(item.id) || uid('notif'),
-    title: safe(item.title) || 'Notificación',
-    message: safe(item.message),
-    type: safe(item.type) || 'info',
-    scope: safe(item.scope) || 'global',
-    source: safe(item.source) || '',
-    readBy: Array.isArray(item.readBy) ? [...new Set(item.readBy.map(normalizeUser))] : [],
-    createdAt: item.createdAt || nowISO(),
-    updatedAt: item.updatedAt || nowISO()
-  };
-}
+  function decodeUtf8Base64(text) {
+    try {
+      return decodeURIComponent(escape(atob(String(text || ''))));
+    } catch {
+      return atob(String(text || ''));
+    }
+  }
 
-function stampValue(item) {
-  if (!item) return '';
-  return String(item.updatedAt || item.createdAt || item.date || '');
-}
+  function githubApiUrl(cfg) {
+    return `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${String(cfg.path).split('/').map(encodeURIComponent).join('/')}`;
+  }
 
-function chooseNewer(a, b) {
-  return stampValue(a) >= stampValue(b) ? a : b;
-}
+  function setGithubStatus(message) {
+    const el = $('githubStatus');
+    if (el) el.textContent = message;
+  }
 
-function normalizeSignatureValue(value) {
-  return safe(value).toLowerCase().replace(/\s+/g, ' ').trim();
-}
-
-function recordFingerprint(rec = {}) {
-  return [
-    normalizeSignatureValue(rec.date || ''),
-    normalizeSignatureValue(rec.loadAt || rec.createdAt || ''),
-    normalizeSignatureValue(rec.unloadAt || ''),
-    normalizeSignatureValue(rec.dryer || ''),
-    normalizeSignatureValue(rec.user || rec.username || ''),
-    normalizeSignatureValue(rec.siloLoad || ''),
-    normalizeSignatureValue(rec.siloOut || ''),
-    normalizeSignatureValue(rec.secadas ?? ''),
-    normalizeSignatureValue(rec.durationHours ?? ''),
-    normalizeSignatureValue(rec.durationMinutes ?? ''),
-    normalizeSignatureValue(rec.stopHours ?? ''),
-    normalizeSignatureValue(rec.stopType || ''),
-    normalizeSignatureValue(rec.mainStop || ''),
-    normalizeSignatureValue(rec.shift || '')
-  ].join('|');
-}
-
-function mergeRecords(remote = [], local = []) {
-  const map = new Map();
-  [...remote, ...local].forEach(rec => {
-    const item = normalizeRecordItem(rec);
-    if (!item) return;
-    const key = item.recordKey || recordFingerprint(item);
-    const prev = map.get(key);
-    map.set(key, prev ? chooseNewer(prev, item) : item);
-  });
-  return [...map.values()].sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')));
-}
-
-function mergeNotifications(remote = [], local = []) {
-  const map = new Map();
-  [...remote, ...local].forEach(item => {
-    const norm = normalizeNotificationItem(item);
-    if (!norm) return;
-    const prev = map.get(norm.id);
-    if (!prev) {
-      map.set(norm.id, norm);
+  function queueCloudSync(reason = 'auto') {
+    if (!hasGithubConfig()) {
+      setGithubStatus('Sincronización GitHub no configurada.');
       return;
     }
-    map.set(norm.id, {
-      ...chooseNewer(prev, norm),
-      readBy: [...new Set([...(prev.readBy || []), ...(norm.readBy || [])])],
-    });
-  });
-  return [...map.values()].sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
-}
-
-function mergeUsers(remote = {}, local = {}) {
-  const base = normalizeUsers(remote || {});
-  const additions = normalizeUsers(local || {});
-  Object.entries(additions).forEach(([key, user]) => {
-    base[key] = { ...(base[key] || {}), ...user, username: normalizeUser(user.username || key) };
-  });
-  return base;
-}
-
-function mergeStates(remoteState = {}, localState = {}) {
-  const base = clone(defaultState());
-  const remote = remoteState && typeof remoteState === 'object' ? remoteState : {};
-  const local = localState && typeof localState === 'object' ? localState : {};
-  return {
-    ...base,
-    ...remote,
-    ...local,
-    settings: {
-      ...base.settings,
-      ...(remote.settings || {}),
-      ...(local.settings || {}),
-      github: {
-        ...(base.settings.github || {}),
-        ...((remote.settings && remote.settings.github) || {}),
-        ...((local.settings && local.settings.github) || {})
-      }
-    },
-    users: mergeUsers(remote.users || {}, local.users || {}),
-    records: mergeRecords(remote.records || [], local.records || []),
-    notifications: mergeNotifications(remote.notifications || [], local.notifications || []),
-    meta: {
-      ...base.meta,
-      ...(remote.meta || {}),
-      ...(local.meta || {}),
-      notificationState: {
-        ...(base.meta.notificationState || {}),
-        ...((remote.meta && remote.meta.notificationState) || {}),
-        ...((local.meta && local.meta.notificationState) || {})
-      }
-    }
-  };
-}
-
-async function githubRequest(url, options = {}) {
-  const token = loadStoredGithubToken();
-  const headers = new Headers(options.headers || {});
-  headers.set('Accept', 'application/vnd.github+json');
-  if (token) headers.set('Authorization', `Bearer ${token}`);
-  if (options.json) {
-    headers.set('Content-Type', 'application/json');
-    options.body = JSON.stringify(options.json);
-    delete options.json;
+    clearTimeout(cloudSyncTimer);
+    cloudSyncTimer = setTimeout(() => {
+      syncToGithub(reason).catch(() => {});
+    }, 700);
   }
-  const res = await fetch(url, { ...options, headers });
-  const text = await res.text();
-  let payload = null;
-  if (text) {
-    try { payload = JSON.parse(text); } catch { payload = text; }
-  }
-  if (!res.ok) {
-    const message = payload && typeof payload === 'object' ? (payload.message || payload.error || text) : text;
-    throw new Error(message || `GitHub respondió ${res.status}`);
-  }
-  return payload;
-}
 
-async function fetchRemoteSnapshot() {
-  const cfg = githubConfig();
-  if (!cfg.owner || !cfg.repo || !cfg.path) {
-    return { exists: false, sha: null, state: null, config: cfg };
-  }
-  const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${githubPathEncode(cfg.path)}?ref=${encodeURIComponent(cfg.branch)}`;
-  const payload = await githubRequest(url, { method: 'GET' });
-  if (!payload || !payload.content) {
-    return { exists: false, sha: null, state: null, config: cfg };
-  }
-  const json = JSON.parse(decodeBase64Utf8(payload.content));
-  return { exists: true, sha: payload.sha || null, state: json, config: cfg };
-}
-
-async function pushRemoteSnapshot(snapshot, sha = null, reason = 'Sincronización') {
-  const cfg = githubConfig();
-  if (!cfg.owner || !cfg.repo || !cfg.path) throw new Error('Falta configurar owner, repo o archivo JSON.');
-  const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${githubPathEncode(cfg.path)}`;
-  const body = {
-    message: `${reason} · ${new Date().toISOString()}`,
-    content: encodeBase64Utf8(JSON.stringify(snapshot, null, 2)),
-    branch: cfg.branch
-  };
-  if (sha) body.sha = sha;
-  const token = loadStoredGithubToken();
-  if (!token) throw new Error('Falta el token de GitHub para guardar cambios.');
-  await githubRequest(url, { method: 'PUT', json: body });
-  return true;
-}
-
-async function pullFromGithub(silent = false) {
-  if (!hasGithubConfig()) {
-    if (!silent) setSyncStatus('offline', 'Sincronización no configurada', 'Completa GitHub en Configuración para activar la nube.');
-    return false;
-  }
-  try {
-    const remote = await fetchRemoteSnapshot();
-    if (remote.state) {
-      state = mergeStates(remote.state, state);
-      ensureGithubDefaults();
-      if (!silent) setSyncStatus('ok', 'Nube actualizada', `Datos cargados desde ${githubConfig().repo}`);
-      saveSession();
-      renderAll();
-    } else if (!silent) {
-      setSyncStatus('warn', 'Archivo no encontrado', 'Crea el JSON inicial en GitHub o usa “Guardar y sincronizar”.');
-    }
-    return true;
-  } catch (err) {
-    if (!silent) setSyncStatus('error', 'Sin conexión', err.message || 'No se pudo leer GitHub.');
-    return false;
-  }
-}
-
-async function syncNow(reason = 'Sincronizar ahora') {
-  if (syncInFlight) return false;
-  if (!hasGithubConfig()) {
-    setSyncStatus('warn', 'Sincronización no configurada', 'Completa los datos de GitHub en Configuración.');
-    return false;
-  }
-  syncInFlight = true;
-  let lastErr = null;
-  try {
-    setSyncStatus('syncing', 'Sincronizando', 'Leyendo nube, unificando cambios y guardando.');
-
-    for (let attempt = 0; attempt < 2; attempt += 1) {
-      try {
-        const remote = await fetchRemoteSnapshot().catch(() => ({ exists: false, sha: null, state: null }));
-        const merged = mergeStates(remote.state || {}, state);
-        ensureGithubDefaults();
-        merged.settings.github = { ...githubConfig() };
-        merged.settings.whatsappNumber = safe(state.settings.whatsappNumber || '');
-        merged.settings.whatsappMessage = safe(state.settings.whatsappMessage || '');
-        await pushRemoteSnapshot(merged, remote.sha, reason);
-        state = merged;
-        state.meta = state.meta || {};
-        state.meta.lastSyncAt = nowISO();
-        saveSession();
-        renderAll();
-        setSyncStatus('ok', 'Sincronizado', `Última actualización ${fmtDate(nowISO())}`);
-        return true;
-      } catch (err) {
-        lastErr = err;
-        const msg = String(err?.message || err || '');
-        const retryable = /sha|conflict|409|422|updated|fresh|stale/i.test(msg);
-        if (attempt === 0 && retryable) {
-          setSyncStatus('warn', 'Reintentando', 'GitHub cambió la base; se vuelve a leer antes de guardar.');
-          await new Promise(r => setTimeout(r, 350));
-          continue;
+  async function loadFromGithub() {
+    const cfg = githubConfig();
+    if (!hasGithubConfig()) return false;
+    setGithubStatus('Cargando datos desde GitHub...');
+    try {
+      const res = await fetch(`${githubApiUrl(cfg)}?ref=${encodeURIComponent(cfg.branch)}`, {
+        headers: {
+          Accept: 'application/vnd.github+json',
+          Authorization: `Bearer ${cfg.token}`,
+          'X-GitHub-Api-Version': '2022-11-28'
         }
-        throw err;
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const file = await res.json();
+      const imported = JSON.parse(decodeUtf8Base64(file.content || ''));
+      imported.settings = { ...defaultState().settings, ...(imported.settings || {}) };
+      imported.settings.github = { ...defaultState().settings.github, ...(imported.settings.github || {}) };
+      imported.users = normalizeUsers(imported.users || defaultState().users);
+      imported.records = normalizeStateRecords(Array.isArray(imported.records) ? imported.records : []);
+      imported.notifications = Array.isArray(imported.notifications) ? imported.notifications : [];
+      imported.meta = imported.meta || clone(defaultState().meta);
+      state = imported;
+      state.meta.cloud = { sha: file.sha, updatedAt: nowISO() };
+      saveState(false);
+      setGithubStatus('Sincronizado con GitHub.');
+      return true;
+    } catch (err) {
+      setGithubStatus(`Sin conexión · revisar GitHub (${err.message || 'error'})`);
+      return false;
+    }
+  }
+
+  async function syncToGithub(reason = 'auto', retry = true) {
+    const cfg = githubConfig();
+    if (!hasGithubConfig()) return false;
+    if (cloudBusy) return false;
+    cloudBusy = true;
+    setGithubStatus(reason === 'manual' ? 'Sincronizando...' : 'Guardando nube...');
+    try {
+      const payload = clone(state);
+      payload.meta = payload.meta || {};
+      delete payload.meta.cloud;
+      const body = {
+        message: `Portal secadas · ${new Date().toISOString()}`,
+        content: encodeUtf8Base64(JSON.stringify(payload, null, 2)),
+        branch: cfg.branch
+      };
+      const existing = state.meta?.cloud?.sha;
+      if (existing) body.sha = existing;
+      const res = await fetch(githubApiUrl(cfg), {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/vnd.github+json',
+          Authorization: `Bearer ${cfg.token}`,
+          'Content-Type': 'application/json',
+          'X-GitHub-Api-Version': '2022-11-28'
+        },
+        body: JSON.stringify(body)
+      });
+      const raw = await res.text();
+      let json = null;
+      try { json = raw ? JSON.parse(raw) : null; } catch { json = null; }
+      if (!res.ok) {
+        if (retry && res.status === 409) {
+          await loadFromGithub();
+          cloudBusy = false;
+          return syncToGithub('retry', false);
+        }
+        throw new Error(json?.message || raw || `HTTP ${res.status}`);
       }
+      state.meta = state.meta || {};
+      state.meta.cloud = { sha: json?.content?.sha || existing || null, updatedAt: nowISO() };
+      saveState(false);
+      setGithubStatus('Sincronizado con GitHub.');
+      return true;
+    } catch (err) {
+      setGithubStatus(`Sin conexión · revisar GitHub (${err.message || 'error'})`);
+      return false;
+    } finally {
+      cloudBusy = false;
     }
-    throw lastErr || new Error('No se pudo sincronizar.');
-  } catch (err) {
-    setSyncStatus('error', 'Error de sincronización', err.message || 'No se pudo guardar en GitHub.');
-    showToast('Sincronización fallida', err.message || 'No se pudo guardar en GitHub.');
-    return false;
-  } finally {
-    syncInFlight = false;
   }
-}
 
-function requestSync(reason = 'Cambio local') {
-  if (syncTimer) clearTimeout(syncTimer);
-  if (!hasGithubConfig()) {
-    setSyncStatus('warn', 'GitHub pendiente', 'Configura owner, repo y archivo JSON para activar la nube.');
-    return;
-  }
-  syncTimer = setTimeout(() => {
-    syncNow(reason);
-  }, 900);
-}
-
-function schedulePull() {
-  if (pullTimer) clearInterval(pullTimer);
-  pullTimer = setInterval(() => {
-    if (session && hasGithubConfig()) {
-      pullFromGithub(true);
-    }
-  }, 30000);
-}
-
-function openWhatsApp() {
-  const number = safe(state.settings.whatsappNumber || '');
-  const message = safe(state.settings.whatsappMessage || 'Hola, necesito ayuda con el portal de secadas.');
-  if (!number) {
-    showToast('WhatsApp no configurado', 'Completa el número en Configuración.');
-    return;
-  }
-  const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank', 'noopener,noreferrer');
-}
-
-function appendSummaryTable(records = getRecordsVisible()) {
-  const completed = completedRecords(records);
-  const today = todayISO();
-  const weekStart = weekStartKey(today);
-  const weekEnd = (() => {
-    const d = new Date(`${weekStart}T00:00:00`);
-    d.setDate(d.getDate() + 6);
-    return d.toISOString().slice(0, 10);
-  })();
-  const month = today.slice(0, 7);
-  const sameDay = (d) => (d || '').slice(0, 10) === today;
-  const sameWeek = (d) => !!d && inRange(d, weekStart, weekEnd);
-  const sameMonth = (d) => (d || '').slice(0, 7) === month;
-  const periods = [
-    { label: 'Hoy', count: sum(completed.filter(r => sameDay(r.date)).map(r => toNumber(r.secadas))), stops: records.filter(r => sameDay(r.date) && Number(r.secadas) === 0).length, note: fmtDateOnly(today) },
-    { label: 'Semana', count: sum(completed.filter(r => sameWeek(r.date)).map(r => toNumber(r.secadas))), stops: records.filter(r => sameWeek(r.date) && Number(r.secadas) === 0).length, note: `${fmtDateOnly(weekStart)} – ${fmtDateOnly(weekEnd)}` },
-    { label: 'Mes', count: sum(completed.filter(r => sameMonth(r.date)).map(r => toNumber(r.secadas))), stops: records.filter(r => sameMonth(r.date) && Number(r.secadas) === 0).length, note: today.slice(0, 7) }
-  ];
-  const target = Number(state.settings.monthlyTarget) || 180;
-  const box = $('periodBreakdown');
-  if (box) {
-    box.innerHTML = `
-      <div class="period-grid">
-        ${periods.map(p => `
-          <div class="period-card">
-            <span>${escapeHtml(p.label)}</span>
-            <strong>${escapeHtml(String(p.count))}</strong>
-            <small>Paros: ${escapeHtml(String(p.stops))} · ${escapeHtml(p.note)}</small>
-          </div>`).join('')}
-        <div class="period-card highlight">
-          <span>Meta mensual</span>
-          <strong>${escapeHtml(String(target))}</strong>
-          <small>Cumplimiento: ${escapeHtml(recordSummary().compliance.toFixed(0))}%</small>
-        </div>
-      </div>
-      <div class="mini-table-wrap">
-        <table class="mini-table">
-          <thead><tr><th>Periodo</th><th>Secadas</th><th>Paros</th><th>Detalle</th></tr></thead>
-          <tbody>
-            ${periods.map(p => `<tr><td>${escapeHtml(p.label)}</td><td>${escapeHtml(String(p.count))}</td><td>${escapeHtml(String(p.stops))}</td><td>${escapeHtml(p.note)}</td></tr>`).join('')}
-            <tr><td>Meta mensual</td><td>${escapeHtml(String(target))}</td><td>—</td><td>Objetivo configurado</td></tr>
-          </tbody>
-        </table>
-      </div>
-    `;
-  }
-}
-
-function renderStopLegend() {
-  const box = $('stopLegend');
-  if (!box) return;
-  const items = [
-    ['Mecánico', 'Fallas de banda, rodamiento, atoro o mantenimiento correctivo.'],
-    ['Eléctrico', 'Corte, protector, sensor o conexión eléctrica.'],
-    ['Motor', 'Paro por motor, arrancador o sobrecarga.'],
-    ['Bomba', 'Interrupción del bombeo o alimentación.'],
-    ['Programado', 'Paro preventivo, limpieza o mantenimiento planificado.']
-  ];
-  box.innerHTML = items.map(([title, text]) => `
-    <div class="legend-item">
-      <strong>${escapeHtml(title)}</strong>
-      <span>${escapeHtml(text)}</span>
-    </div>
-  `).join('');
-}
-
-function renderStopJustifications() {
-  const box = $('stopJustifications');
-  if (!box) return;
-  const stops = state.records
-    .filter(r => Number(r.secadas) === 0 || Number(r.stopHours) > 0 || safe(r.mainStop))
-    .slice()
-    .sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')))
-    .slice(0, 6);
-  if (!stops.length) {
-    box.innerHTML = `<div class="empty">Aún no hay justificaciones de paro.</div>`;
-    return;
-  }
-  box.innerHTML = stops.map(r => `
-    <div class="stop-item">
-      <div class="stop-title">${escapeHtml(fmtDateOnly(r.date))} · Secadora ${escapeHtml(String(r.dryer))} · ${escapeHtml(r.shift)}</div>
-      <div class="stop-meta"><strong>Tipo:</strong> ${escapeHtml(summarizeCause(r.mainStop || r.stopType, r.secadas))}</div>
-      <div class="stop-meta"><strong>Justificación:</strong> ${escapeHtml(r.mainStop || 'Sin descripción')}</div>
-      <div class="stop-meta"><strong>Horas:</strong> ${escapeHtml(recordDurationText(r))} · <strong>Notas:</strong> ${escapeHtml(r.notes || '—')}</div>
-    </div>
-  `).join('');
-}
   function resetPortal() {
     state = defaultState();
-    ensureGithubDefaults();
     editingRecordId = null;
-    saveState();
+    saveSession();
+    saveState(false);
     renderAll();
-    showToast('Base inicial cargada', 'Se cargó la configuración inicial del sistema.');
+    showToast('Base restaurada', 'Se cargó la configuración inicial del sistema.');
   }
 
   function login() {
@@ -781,7 +522,7 @@ function renderStopJustifications() {
   }
 
   function getRecordsVisible() {
-    return state.records.slice();
+    return currentUser() ? state.records.slice() : [];
   }
 
   function recordSummary() {
@@ -916,9 +657,6 @@ function renderStopJustifications() {
         });
       }
     }
-    appendSummaryTable(state.records);
-    renderStopLegend();
-    renderStopJustifications();
   }
 
   function normalizeBulkHeaders(row) {
@@ -966,8 +704,7 @@ function renderStopJustifications() {
         `Materia prima: ${performanceRaw || '—'}`
       ].join(' · ');
 
-      const autoStop = !completed;
-      rows.push({
+      const rec = {
         id: uid('rec'),
         user,
         fullName,
@@ -977,9 +714,9 @@ function renderStopJustifications() {
         secadas: completed ? 1 : 0,
         durationHours: completed && unloadAt ? Math.max(0, Math.round((new Date(unloadAt).getTime() - new Date(loadAt).getTime()) / 3600000)) : null,
         durationMinutes: completed && unloadAt ? String(Math.max(0, Math.round(((new Date(unloadAt).getTime() - new Date(loadAt).getTime()) % 3600000) / 60000))).padStart(2, '0') : null,
-        stopHours: autoStop ? 12 : 0,
-        stopType: autoStop ? 'programado' : '',
-        mainStop: autoStop ? `Secadora ${dryer} sin producción registrada. Pendiente de justificar.` : '',
+        stopHours: completed ? 0 : 12,
+        stopType: completed ? '' : 'programado',
+        mainStop: completed ? '' : 'Registro incompleto o secadora sin cierre de descarga.',
         notes: sourceNotes,
         createdAt,
         updatedAt: nowISO(),
@@ -997,52 +734,46 @@ function renderStopJustifications() {
         responsibleOut: row(13),
         yieldHead: performanceHead,
         yieldRaw: performanceRaw,
-        recordKey: recordFingerprint({
-          date: dateKey,
-          loadAt,
-          unloadAt,
-          dryer: String(dryer),
-          user,
-          secadas: completed ? 1 : 0,
-          durationHours: completed && unloadAt ? Math.max(0, Math.round((new Date(unloadAt).getTime() - new Date(loadAt).getTime()) / 3600000)) : null,
-          durationMinutes: completed && unloadAt ? String(Math.max(0, Math.round(((new Date(unloadAt).getTime() - new Date(loadAt).getTime()) % 3600000) / 60000))).padStart(2, '0') : null,
-          stopHours: autoStop ? 12 : 0,
-          stopType: autoStop ? 'programado' : '',
-          mainStop: autoStop ? `Secadora ${dryer} sin producción registrada. Pendiente de justificar.` : '',
-          shift: loadAt ? (new Date(loadAt).getHours() >= 6 && new Date(loadAt).getHours() < 18 ? 'Día' : 'Noche') : 'Día',
-          siloLoad: row(2),
-          siloOut: row(12)
-        }),
-        sourceLabel: 'Carga masiva'
-      });
+        sourceLabel: 'Pega masiva'
+      };
+      rec.fingerprint = makeRecordFingerprint(rec);
+      rows.push(rec);
     });
 
     return { rows, warnings: hasHeader ? [] : ['No se detectó encabezado; se importó por orden de columnas.'] };
   }
 
   function bulkPreview() {
-
     const box = $('bulkImportInfo');
     if (!box) return;
     const text = $('bulkPasteInput').value;
     const { rows, warnings } = parseBulkRows(text);
-    const completed = rows.filter(r => Number(r.secadas) > 0).length;
-    const pending = rows.length - completed;
+    const byDryer = {};
+    const minutesByDryer = {};
+    rows.forEach(r => {
+      const d = String(r.dryer || '—');
+      if (!byDryer[d]) byDryer[d] = { secadas: 0, paros: 0 };
+      if (!minutesByDryer[d]) minutesByDryer[d] = [];
+      if (Number(r.secadas) > 0) {
+        byDryer[d].secadas += 1;
+        minutesByDryer[d].push(minutesFromRecord(r));
+      } else {
+        byDryer[d].paros += 1;
+      }
+    });
     const dates = [...new Set(rows.map(r => r.date).filter(Boolean))].length;
+    const dryerLines = Object.keys(byDryer).sort((a, b) => Number(a) - Number(b)).map(d => {
+      const avgMins = minutesByDryer[d].length ? minutesByDryer[d].reduce((a, b) => a + b, 0) / minutesByDryer[d].length : 0;
+      return `Secadora ${escapeHtml(d)} = <strong>${byDryer[d].secadas}</strong> secadas · Paros: <strong>${byDryer[d].paros}</strong> · Promedio: <strong>${escapeHtml(formatMinutes(avgMins))}</strong>`;
+    });
     box.innerHTML = `
       <strong>Vista previa</strong><br>
-      Filas detectadas: ${rows.length}<br>
-      Secadas reales: ${completed}<br>
-      Paros / pendientes: ${pending}<br>
+      ${dryerLines.join('<br>') || 'Sin datos por secadora.'}<br>
       Días con datos: ${dates}${warnings.length ? `<br>${warnings.map(escapeHtml).join('<br>')}` : ''}
     `;
   }
 
-  function bulkRecordSignature(rec) {
-    return recordFingerprint(rec);
-  }
-
-  async function bulkImport() {
+  function bulkImport() {
     const text = $('bulkPasteInput').value;
     const { rows, warnings } = parseBulkRows(text);
     if (!rows.length) {
@@ -1050,9 +781,9 @@ function renderStopJustifications() {
       return;
     }
 
-    const existing = new Set(state.records.map(bulkRecordSignature));
+    const existing = new Set(state.records.map(r => r.fingerprint || makeRecordFingerprint(r)));
     const newRows = rows.filter(r => {
-      const key = bulkRecordSignature(r);
+      const key = r.fingerprint || makeRecordFingerprint(r);
       if (existing.has(key)) return false;
       existing.add(key);
       return true;
@@ -1063,36 +794,14 @@ function renderStopJustifications() {
       return;
     }
 
-    const newCount = newRows.length;
-    const stopCount = newRows.filter(r => Number(r.secadas) === 0).length;
-    state.records = [...newRows, ...state.records];
-    state.meta = state.meta || {};
-    state.meta.updatedAt = nowISO();
-    state.meta.lastBulkImport = nowISO();
-    state.meta.lastBulkCount = newCount;
-    state.meta.lastBulkStops = stopCount;
-
-    state.notifications.unshift(buildNotification(
-      'Carga masiva importada',
-      `${newCount} registros nuevos${stopCount ? ` y ${stopCount} paros automáticos` : ''} quedaron guardados desde el pegado tabulado.`,
-      stopCount ? 'warning' : 'success',
-      'bulk'
-    ));
-
+    state.records = normalizeStateRecords([...newRows, ...state.records]);
     saveState();
+    queueCloudSync('bulk');
     renderAll();
-
-    try {
-      await syncNow('Carga masiva');
-    } catch {
-      // syncNow already reports the issue
-    }
-
-    showToast('Importación lista', `Se agregaron ${newCount} registros${stopCount ? ` y ${stopCount} paros automáticos` : ''}${warnings.length ? ' con aviso de formato.' : ''}`);
+    showToast('Importación lista', `Se agregaron ${newRows.length} registros${warnings.length ? ' con aviso de formato.' : ''}`);
   }
 
   function clearBulkPaste() {
-
     $('bulkPasteInput').value = '';
     $('bulkImportInfo').textContent = 'Listo para pegar datos.';
   }
@@ -1488,13 +1197,14 @@ function renderStopJustifications() {
       secadas,
       durationHours: secadas > 0 ? $('durationHours').value : null,
       durationMinutes: secadas > 0 ? $('durationMinutes').value : null,
-      stopHours: secadas === 0 ? toNumber($('stopHours').value, 0) : 0,
+      stopHours: secadas === 0 ? 12 : 0,
       stopType: secadas === 0 ? $('stopType').value : '',
       mainStop: secadas === 0 ? safe($('mainStop').value) : '',
       notes: safe($('recordNotes').value),
       createdAt: editingRecordId ? (state.records.find(r => r.id === editingRecordId)?.createdAt || nowISO()) : nowISO(),
       updatedAt: nowISO()
     };
+    rec.fingerprint = makeRecordFingerprint(rec);
 
     if (editingRecordId) {
       const idx = state.records.findIndex(r => r.id === editingRecordId);
@@ -1505,9 +1215,11 @@ function renderStopJustifications() {
       quickNotificationForRecord(rec, 'registró');
     }
 
+    state.records = normalizeStateRecords(state.records);
     editingRecordId = null;
     setCanEditFields();
     saveState();
+    queueCloudSync('record');
     resetRecordForm();
     renderAll();
     showToast('Guardado', 'El registro quedó almacenado.');
@@ -1516,7 +1228,7 @@ function renderStopJustifications() {
   function deleteRecord(id) {
     const rec = state.records.find(r => r.id === id);
     if (!rec) return;
-    if (!isAdmin() && !canEditRecord(rec)) return;
+    if (!isAdmin()) return;
     if (!confirm('¿Eliminar este registro?')) return;
     state.records = state.records.filter(r => r.id !== id);
     pushNotification('Registro eliminado', `Se eliminó un registro del turno ${rec.shift}.`, 'danger', 'record');
@@ -1527,7 +1239,7 @@ function renderStopJustifications() {
   function editRecord(id) {
     const rec = state.records.find(r => r.id === id);
     if (!rec) return;
-    if (!isAdmin() && !canEditRecord(rec)) return;
+    if (!currentUser()) return;
     loadRecordToForm(rec);
   }
 
@@ -1540,8 +1252,10 @@ function renderStopJustifications() {
     }
     body.innerHTML = rows.map(r => {
       const actions = [];
-      if (canEditRecord(r) || isAdmin()) {
+      if (currentUser()) {
         actions.push(`<button class="small-btn primary" data-edit="${r.id}">Editar</button>`);
+      }
+      if (isAdmin()) {
         actions.push(`<button class="small-btn danger" data-del="${r.id}">Eliminar</button>`);
       }
       return `
@@ -1703,31 +1417,62 @@ function renderStopJustifications() {
     state.settings.monthlyTarget = Math.max(1, toNumber($('settingMonthlyTarget').value, 180));
     state.settings.alertHours = Math.max(1, toNumber($('settingAlertHours').value, 12));
     state.settings.theme = $('settingTheme').value || 'blue';
+    state.settings.whatsappNumber = safe($('settingWhatsappNumber').value);
+    state.settings.whatsappMessage = safe($('settingWhatsappMessage').value);
     state.settings.github = {
       owner: safe($('githubOwner').value),
       repo: safe($('githubRepo').value),
       branch: safe($('githubBranch').value) || 'main',
-      path: safe($('githubPath').value) || 'portal-data.json',
-      autoSync: $('githubAutoSync').value === 'true'
+      path: safe($('githubPath').value) || 'portal-data.json'
     };
-    state.settings.whatsappNumber = safe($('whatsappNumber').value);
-    state.settings.whatsappMessage = safe($('whatsappMessage').value) || 'Hola, necesito ayuda con el portal de secadas.';
     const token = safe($('githubToken').value);
-    if (token && token !== '••••••••••') saveStoredGithubToken(token);
+    if (token) sessionStorage.setItem(GITHUB_TOKEN_KEY, token);
     setTheme(state.settings.theme);
     saveState();
+    queueCloudSync('manual');
     renderAll();
-    showToast('Configuración guardada', 'Los cambios quedaron listos para sincronizar.');
-    if (hasGithubConfig() && loadStoredGithubToken()) syncNow('Configuración guardada');
+    showToast('Configuración guardada', 'Los cambios ya quedaron aplicados.');
   }
 
   function resetSettings() {
     if (!isAdmin()) return;
     state.settings = clone(defaultState().settings);
-    ensureGithubDefaults();
     saveState();
     renderAll();
     showToast('Ajustes restaurados', 'Se aplicó la configuración base.');
+  }
+
+  function renderGithubStatus() {
+    const el = $('githubStatus');
+    if (!el) return;
+    const cfg = githubConfig();
+    if (!cfg.owner || !cfg.repo) {
+      el.textContent = 'Sincronización GitHub no configurada.';
+      return;
+    }
+    if (!cfg.token) {
+      el.textContent = `GitHub listo · ${cfg.owner}/${cfg.repo} · Falta token de sesión.`;
+      return;
+    }
+    el.textContent = `GitHub listo · ${cfg.owner}/${cfg.repo} · ${cfg.branch}/${cfg.path}`;
+  }
+
+  function updateWhatsAppButton() {
+    const btn = $('whatsappBtn');
+    if (!btn) return;
+    const number = safe(state.settings.whatsappNumber).replace(/\D/g, '');
+    btn.dataset.whatsapp = number;
+    btn.title = number ? `WhatsApp ${number}` : 'Configura el número de WhatsApp';
+  }
+
+  function openWhatsApp() {
+    const number = safe(state.settings.whatsappNumber).replace(/\D/g, '');
+    if (!number) {
+      showToast('WhatsApp', 'Configura el número en ajustes.');
+      return;
+    }
+    const message = encodeURIComponent(state.settings.whatsappMessage || 'Hola, te comparto el portal de secadas.');
+    window.open(`https://wa.me/${number}?text=${message}`, '_blank', 'noopener');
   }
 
   function exportJson() {
@@ -1757,7 +1502,7 @@ function renderStopJustifications() {
     URL.revokeObjectURL(url);
   }
 
-  function importJsonFile(file, merge = false) {
+  function importJsonFile(file) {
     const reader = new FileReader();
     reader.onload = () => {
       try {
@@ -1765,28 +1510,18 @@ function renderStopJustifications() {
         if (!imported || typeof imported !== 'object') throw new Error('JSON inválido');
         if (!imported.settings || !imported.users || !Array.isArray(imported.records)) throw new Error('Faltan campos base');
 
-        const normalized = {
+        state = {
           ...clone(defaultState()),
           ...imported,
-          settings: {
-            ...clone(defaultState().settings),
-            ...(imported.settings || {}),
-            github: {
-              ...clone(defaultState().settings.github),
-              ...((imported.settings && imported.settings.github) || {})
-            }
-          },
+          settings: { ...defaultState().settings, ...(imported.settings || {}) },
           users: normalizeUsers(imported.users),
-          records: Array.isArray(imported.records) ? imported.records.map(normalizeRecordItem).filter(Boolean) : [],
-          notifications: Array.isArray(imported.notifications) ? imported.notifications.map(normalizeNotificationItem).filter(Boolean) : [],
+          records: normalizeStateRecords(Array.isArray(imported.records) ? imported.records : []),
+          notifications: Array.isArray(imported.notifications) ? imported.notifications : [],
           meta: imported.meta || clone(defaultState().meta)
         };
-
-        state = merge ? mergeStates(state, normalized) : mergeStates(normalized, clone(defaultState()));
-        ensureGithubDefaults();
         saveState();
         renderAll();
-        showToast('Importación exitosa', merge ? 'El historial fue combinado con la base actual.' : 'El respaldo fue cargado correctamente.');
+        showToast('Importación exitosa', 'El respaldo fue cargado correctamente.');
       } catch (err) {
         showToast('Error de importación', err.message || 'No se pudo leer el archivo.');
       }
@@ -1797,8 +1532,7 @@ function renderStopJustifications() {
   function readFileInput() {
     const input = $('importJsonInput');
     const file = input.files && input.files[0];
-    if (file) importJsonFile(file, input.dataset.merge === 'true');
-    input.dataset.merge = 'false';
+    if (file) importJsonFile(file);
     input.value = '';
   }
 
@@ -1825,9 +1559,42 @@ function renderStopJustifications() {
     });
   }
 
+  function renderWeeklyInsights() {
+    const box = $('weeklyComparisonPanel');
+    if (box) {
+      const data = weeklyComparisonData();
+      const pct = (a, b) => (b ? ((a - b) / b) * 100 : 0);
+      box.innerHTML = `
+        <div class="period-stat"><span>${weekLabel(data.current.start)}</span><strong>${data.current.total}</strong><span>Semana actual</span></div>
+        <div class="period-stat"><span>${weekLabel(data.previous.start)}</span><strong>${data.previous.total}</strong><span>Semana pasada</span></div>
+        <div class="period-stat"><span>${weekLabel(data.ante.start)}</span><strong>${data.ante.total}</strong><span>Semana antepasada</span></div>
+        <div class="period-stat"><span>Variación vs pasada</span><strong>${(data.current.total - data.previous.total) >= 0 ? '+' : ''}${data.current.total - data.previous.total}</strong><span>${pct(data.current.total, data.previous.total).toFixed(1)}%</span></div>
+        <div class="period-stat"><span>Variación vs antepasada</span><strong>${(data.current.total - data.ante.total) >= 0 ? '+' : ''}${data.current.total - data.ante.total}</strong><span>${pct(data.current.total, data.ante.total).toFixed(1)}%</span></div>
+        <div class="period-stat"><span>Pronóstico</span><strong>${data.forecast}</strong><span>Proyección siguiente semana</span></div>
+      `;
+    }
+
+    const dryerBox = $('dryerSummaryPanel');
+    if (dryerBox) {
+      dryerBox.innerHTML = dryerConsolidatedData().map(d => `
+        <div class="missing-dryer">
+          <div class="user-top">
+            <div>
+              <div class="stop-title">Secadora ${d.dryer}</div>
+              <div class="stop-meta">Hoy: ${d.today} · Semana: ${d.week} · Mes: ${d.month}</div>
+            </div>
+            <span class="tag">Promedio ${formatMinutes(d.avgMinutes)}</span>
+          </div>
+          <div class="stop-meta">Paros detectados: ${d.stops}</div>
+        </div>
+      `).join('');
+    }
+  }
+
   function renderCharts() {
     drawBarChart($('shiftChart'), shiftSeries().labels, shiftSeries().values, ['#2563eb', '#8b5cf6']);
-    drawLineChart($('trendChart'), trendSeries(14).labels, trendSeries(14).values, '#14b8a6');
+    drawLineChart($('trendChart'), trendSeries(14).labels, trendSeries(14).values, '#14b8a6', { threshold: Number(state.settings.dailyTarget) || 6, thresholdLabel: `Meta ${Number(state.settings.dailyTarget) || 6}` });
+    drawBarChart($('forecastChart'), weeklyForecastSeries().labels, weeklyForecastSeries().values, ['#2563eb', '#8b5cf6', '#14b8a6', '#f59e0b']);
     drawMonthlyChart($('monthlyChart'));
   }
 
@@ -1882,7 +1649,7 @@ function renderStopJustifications() {
     ctx.textAlign = 'start';
   }
 
-  function drawLineChart(canvas, labels, values, color = '#14b8a6') {
+  function drawLineChart(canvas, labels, values, color = '#14b8a6', options = {}) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const ratio = window.devicePixelRatio || 1;
@@ -1893,45 +1660,71 @@ function renderStopJustifications() {
     canvas.height = height * ratio;
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, width, height);
 
-    const pad = { l: 44, r: 20, t: 18, b: 44 };
+    const pad = { l: 44, r: 20, t: 18, b: 56 };
     const chartW = width - pad.l - pad.r;
     const chartH = height - pad.t - pad.b;
-    const max = Math.max(1, ...values) * 1.15;
-
+    const threshold = Number(options.threshold);
+    const maxVal = Math.max(1, ...values, Number.isFinite(threshold) ? threshold : 0) * 1.15;
     ctx.strokeStyle = '#e5edf6';
+    ctx.lineWidth = 1;
+
     for (let i = 0; i <= 4; i++) {
       const y = pad.t + chartH - (chartH / 4) * i;
       ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(width - pad.r, y); ctx.stroke();
       ctx.fillStyle = '#7b8ba2';
       ctx.font = '12px sans-serif';
-      ctx.fillText(String(Math.round(max / 4 * i)), 10, y + 4);
+      ctx.fillText(String(Math.round(maxVal / 4 * i)), 10, y + 4);
     }
 
-    ctx.beginPath();
-    values.forEach((v, i) => {
-      const x = pad.l + (chartW / Math.max(1, values.length - 1)) * i;
-      const y = pad.t + chartH - (v / max) * chartH;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
+    if (Number.isFinite(threshold)) {
+      const y = pad.t + chartH - (threshold / maxVal) * chartH;
+      ctx.save();
+      ctx.strokeStyle = '#ef4444';
+      ctx.setLineDash([6, 6]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(width - pad.r, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '700 12px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(options.thresholdLabel || `Meta ${threshold}`, pad.l + 4, y - 6);
+      ctx.restore();
+    }
+
+    const points = values.map((v, i) => ({
+      x: pad.l + (chartW / Math.max(1, values.length - 1)) * i,
+      y: pad.t + chartH - (v / maxVal) * chartH,
+      v
+    }));
+
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;
+    ctx.beginPath();
+    points.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
     ctx.stroke();
 
-    values.forEach((v, i) => {
-      const x = pad.l + (chartW / Math.max(1, values.length - 1)) * i;
-      const y = pad.t + chartH - (v / max) * chartH;
+    ctx.fillStyle = color;
+    points.forEach(p => {
+      ctx.beginPath(); ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.font = '700 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#17324f';
+      ctx.fillText(String(p.v), p.x, p.y - 10);
       ctx.fillStyle = color;
-      ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI * 2); ctx.fill();
-      if (i % 2 === 0 || i === values.length - 1) {
-        ctx.fillStyle = '#5e6f84';
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(labels[i], x, height - 20);
-      }
+    });
+
+    ctx.fillStyle = '#5e6f84';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    labels.forEach((lab, i) => {
+      const x = pad.l + (chartW / Math.max(1, labels.length - 1)) * i;
+      ctx.fillText(String(lab), x, height - 20);
     });
     ctx.textAlign = 'start';
   }
@@ -1978,23 +1771,20 @@ function renderStopJustifications() {
   }
 
   function populateSettings() {
-    ensureGithubDefaults();
     $('settingPortalName').value = state.settings.portalName || '';
     $('settingPortalTagline').value = state.settings.portalTagline || '';
     $('settingDailyTarget').value = state.settings.dailyTarget || 6;
     $('settingMonthlyTarget').value = state.settings.monthlyTarget || 180;
     $('settingAlertHours').value = state.settings.alertHours || 12;
     $('settingTheme').value = state.settings.theme || 'blue';
-    $('githubOwner').value = safe(state.settings.github?.owner || '');
-    $('githubRepo').value = safe(state.settings.github?.repo || '');
-    $('githubBranch').value = safe(state.settings.github?.branch || 'main');
-    $('githubPath').value = safe(state.settings.github?.path || 'portal-data.json');
-    $('githubAutoSync').value = String(state.settings.github?.autoSync !== false);
-    $('githubToken').value = loadStoredGithubToken() ? '••••••••••' : '';
-    $('whatsappNumber').value = safe(state.settings.whatsappNumber || '');
-    $('whatsappMessage').value = safe(state.settings.whatsappMessage || 'Hola, necesito ayuda con el portal de secadas.');
+    $('settingWhatsappNumber').value = state.settings.whatsappNumber || '';
+    $('settingWhatsappMessage').value = state.settings.whatsappMessage || '';
+    $('githubOwner').value = state.settings.github?.owner || '';
+    $('githubRepo').value = state.settings.github?.repo || '';
+    $('githubBranch').value = state.settings.github?.branch || 'main';
+    $('githubPath').value = state.settings.github?.path || 'portal-data.json';
+    $('githubToken').value = sessionStorage.getItem(GITHUB_TOKEN_KEY) || '';
     setTheme(state.settings.theme || 'blue');
-    renderSyncStatus();
   }
 
   function updateHeader() {
@@ -2039,15 +1829,18 @@ function renderStopJustifications() {
     topStops();
     recentActivity();
     renderPeriodStats();
+    renderWeeklyInsights();
     renderCharts();
     renderMonthlyNotes();
-    renderSyncStatus();
+    updateWhatsAppButton();
+    renderGithubStatus();
     $('recordDate').value = $('recordDate').value || todayISO();
     $('editModeBadge').classList.toggle('hidden', !editingRecordId);
   }
 
   function bindControls() {
     $('loginBtn').addEventListener('click', login);
+    if ($('loginResetBtn')) $('loginResetBtn').addEventListener('click', resetPortal);
     $('logoutBtn').addEventListener('click', logout);
     $('saveRecordBtn').addEventListener('click', saveRecord);
     $('clearRecordBtn').addEventListener('click', resetRecordForm);
@@ -2058,27 +1851,15 @@ function renderStopJustifications() {
     $('createUserBtn').addEventListener('click', createUser);
     $('saveSettingsBtn').addEventListener('click', saveSettings);
     $('resetSettingsBtn').addEventListener('click', resetSettings);
-    $('saveSyncBtn').addEventListener('click', saveSettings);
-    $('syncNowBtn').addEventListener('click', () => syncNow('Sincronización manual'));
-    $('githubPullBtn').addEventListener('click', () => pullFromGithub(false));
-    $('whatsappQuickBtn').addEventListener('click', openWhatsApp);
     $('exportJsonBtn').addEventListener('click', exportJson);
     $('exportCsvBtn').addEventListener('click', exportCsv);
-    $('importJsonBtn').addEventListener('click', () => {
-      $('importJsonInput').dataset.merge = 'false';
-      $('importJsonInput').click();
-    });
-    $('importJsonMergeBtn').addEventListener('click', () => {
-      $('importJsonInput').dataset.merge = 'true';
-      $('importJsonInput').click();
-    });
+    $('importJsonBtn').addEventListener('click', () => $('importJsonInput').click());
     $('importJsonInput').addEventListener('change', readFileInput);
-    $('refreshBtn').addEventListener('click', async () => {
-      await pullFromGithub(false);
-      checkIdleAlerts();
-      renderAll();
-      showToast('Actualizado', 'Se recargó el tablero.');
-    });
+    if ($('factoryResetBtn')) $('factoryResetBtn').addEventListener('click', () => { if (confirm('¿Restaurar base completa?')) resetPortal(); });
+    $('refreshBtn').addEventListener('click', () => { checkIdleAlerts(); renderAll(); queueCloudSync('manual'); showToast('Actualizado', 'Se recargó el tablero.'); });
+    if ($('whatsappBtn')) $('whatsappBtn').addEventListener('click', openWhatsApp);
+    if ($('saveGithubBtn')) $('saveGithubBtn').addEventListener('click', () => { saveSettings(); showToast('Nube lista', 'La configuración GitHub quedó guardada.'); });
+    if ($('syncGithubBtn')) $('syncGithubBtn').addEventListener('click', async () => { saveSettings(); await syncToGithub('manual'); renderAll(); });
     $('notifBell').addEventListener('click', () => $('notifPanel').classList.toggle('hidden'));
     $('closeNotifBtn').addEventListener('click', () => $('notifPanel').classList.add('hidden'));
     $('markAllReadBtn').addEventListener('click', () => {
@@ -2152,33 +1933,23 @@ function renderStopJustifications() {
     bindNav();
     bindControls();
     initialFill();
-    ensureGithubDefaults();
     setTheme(state.settings.theme || 'blue');
-    renderSyncStatus();
+    await loadFromGithub();
+    populateSettings();
     if (session && currentUser()) {
       $('loginView').classList.add('hidden');
       $('appView').classList.remove('hidden');
       scheduleNotificationChecks();
     }
-    if (hasGithubConfig()) {
-      await pullFromGithub(true);
-      renderAll();
-    }
     checkIdleAlerts();
     renderAll();
-    schedulePull();
-    window.addEventListener('focus', () => {
-      if (session && hasGithubConfig() && githubConfig().autoSync !== false) pullFromGithub(true);
-    });
-    document.addEventListener('visibilitychange', () => {
-      if (session && hasGithubConfig() && githubConfig().autoSync !== false && !document.hidden) pullFromGithub(true);
-    });
     setInterval(() => {
       if (session) {
         renderBell();
         renderCharts();
       }
     }, 15000);
+    window.addEventListener('focus', () => { if (session) loadFromGithub().then(() => renderAll()); });
   }
 
   window.__portal = {
