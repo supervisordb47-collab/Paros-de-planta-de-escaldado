@@ -3155,25 +3155,6 @@
       "fingerprint": "COMP|2026-03-24|2||||"
     },
     {
-      "id": "rec_cbofhkwj88uz",
-      "user": "ADMIN",
-      "fullName": "Administrador",
-      "date": "2026-03-23",
-      "shift": "Día",
-      "dryer": "2",
-      "secadas": 1,
-      "durationHours": "06",
-      "durationMinutes": "45",
-      "stopHours": 0,
-      "stopType": "",
-      "mainStop": "",
-      "notes": "",
-      "createdAt": "2026-03-27T23:00:17.243Z",
-      "updatedAt": "2026-03-27T23:00:17.243Z",
-      "recordKey": "2026-03-23|2026-03-27t23:00:17.243z||2|admin|||1|06|45|0|||día",
-      "fingerprint": "COMP|2026-03-23|2||||"
-    },
-    {
       "id": "rec_h74drqka5fye",
       "user": "ADMIN",
       "fullName": "Administrador",
@@ -3346,6 +3327,16 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif_pcmy6fvadhdd",
+      "title": "Registro eliminado",
+      "message": "Se eliminó un registro del turno Día.",
+      "type": "danger",
+      "scope": "record",
+      "createdAt": "2026-03-28T23:48:01.201Z",
+      "readBy": [],
+      "source": "system"
+    },
     {
       "id": "notif_hgaskvra07ci",
       "title": "Nuevo registro",
