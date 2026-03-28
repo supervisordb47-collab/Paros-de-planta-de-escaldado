@@ -8,15 +8,14 @@ const PORTAL_DEFAULT_DATA = {
     alertHours: 12,
     totalDryers: 3,
     theme: 'blue',
+    whatsappNumber: '',
+    whatsappMessage: 'Hola, te comparto el portal de secadas.',
     github: {
       owner: '',
       repo: '',
       branch: 'main',
-      path: 'portal-data.json',
-      autoSync: true
-    },
-    whatsappNumber: '',
-    whatsappMessage: 'Hola, necesito apoyo con el portal de secadas.'
+      path: 'portal-data.json'
+    }
   },
   users: {
     ADMIN: {
