@@ -3353,7 +3353,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-28T23:37:41.682Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3363,7 +3365,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-28T23:37:29.929Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3373,7 +3377,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-28T13:46:59.111Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3384,7 +3390,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-28T13:44:18.793Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3395,7 +3403,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-28T13:43:03.992Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3419,7 +3429,9 @@
       "type": "warning",
       "scope": "shift",
       "createdAt": "2026-03-28T12:44:04.551Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3430,7 +3442,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:08:55.063Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3441,7 +3455,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:07:32.779Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3452,7 +3468,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:06:11.031Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3463,7 +3481,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:05:06.728Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3474,7 +3494,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:04:46.899Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3485,7 +3507,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:03:18.932Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3496,7 +3520,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:02:54.743Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3507,7 +3533,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:02:38.480Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3518,7 +3546,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:01:57.414Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3529,7 +3559,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:01:40.897Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3540,7 +3572,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T23:00:17.243Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3551,7 +3585,9 @@
       "type": "danger",
       "scope": "record",
       "createdAt": "2026-03-27T22:58:06.470Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3562,7 +3598,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T22:57:12.627Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3586,7 +3624,9 @@
       "type": "danger",
       "scope": "record",
       "createdAt": "2026-03-27T22:53:58.464Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3597,7 +3637,9 @@
       "type": "danger",
       "scope": "record",
       "createdAt": "2026-03-27T22:52:23.605Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3608,7 +3650,9 @@
       "type": "danger",
       "scope": "record",
       "createdAt": "2026-03-27T22:52:04.161Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3619,7 +3663,9 @@
       "type": "danger",
       "scope": "record",
       "createdAt": "2026-03-27T22:51:20.177Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3630,7 +3676,9 @@
       "type": "danger",
       "scope": "record",
       "createdAt": "2026-03-27T22:51:00.972Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3641,7 +3689,9 @@
       "type": "danger",
       "scope": "record",
       "createdAt": "2026-03-27T22:50:31.651Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3652,7 +3702,9 @@
       "type": "success",
       "scope": "record",
       "createdAt": "2026-03-27T22:43:26.334Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3676,7 +3728,9 @@
       "type": "warning",
       "scope": "shift",
       "createdAt": "2026-03-27T20:48:38.505Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     },
@@ -3687,7 +3741,9 @@
       "type": "warning",
       "scope": "shift",
       "createdAt": "2026-03-27T20:48:38.505Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system",
       "updatedAt": "2026-03-28T20:23:31.771Z"
     }
