@@ -5,38 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portal Secadas | Sistema Portable</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
 <body>
   <div id="toast" class="toast" aria-live="polite"></div>
 
   <div id="loginView" class="login-screen">
-    <div class="login-card">
-      <div class="brand">
-        <div class="brand-mark">S</div>
-        <div>
-          <h1 id="loginTitle">Portal de Secadas</h1>
-          <p>Sistema portable de registros, alertas, usuarios y tendencias.</p>
+    <div class="login-card login-shell">
+      <section class="login-hero">
+        <div class="brand">
+          <div class="brand-mark">S</div>
+          <div>
+            <h1 id="loginTitle">Portal de Secadas</h1>
+            <p>Sistema corporativo para control de secadas, paros, históricos, forecast y trazabilidad.</p>
+          </div>
         </div>
-      </div>
 
-      <div class="login-grid">
-        <label class="field">
-          <span>Usuario</span>
-          <input id="loginUser" type="text" autocomplete="username" placeholder="Escribe tu usuario" />
-        </label>
-        <label class="field">
-          <span>Contraseña</span>
-          <input id="loginPass" type="password" autocomplete="current-password" placeholder="Contraseña" />
-        </label>
-      </div>
+        <div class="login-highlights">
+          <div class="hero-metric">
+            <span>Histórico consolidado</span>
+            <strong>Mensual / semanal / diario</strong>
+          </div>
+          <div class="hero-metric">
+            <span>Sincronización</span>
+            <strong>GitHub + respaldo operativo</strong>
+          </div>
+          <div class="hero-metric">
+            <span>Alertas</span>
+            <strong>Paros automáticos y notificaciones</strong>
+          </div>
+          <div class="hero-metric">
+            <span>Analítica</span>
+            <strong>Tendencia, forecast y comparación</strong>
+          </div>
+        </div>
 
-      <div class="login-actions">
-        <button id="loginBtn" class="btn primary">Ingresar</button>
-      </div>
+        <div class="hero-note">
+          Diseñado para planta: lectura rápida, consolidado visible y control por usuario.
+        </div>
+      </section>
 
-      <div class="login-note">
-        Ingresa tus credenciales para acceder al portal.
-      </div>
+      <section class="login-panel">
+        <div class="panel-kicker">Acceso seguro</div>
+        <div class="login-grid">
+          <label class="field">
+            <span>Usuario</span>
+            <input id="loginUser" type="text" autocomplete="username" placeholder="Escribe tu usuario" />
+          </label>
+          <label class="field">
+            <span>Contraseña</span>
+            <input id="loginPass" type="password" autocomplete="current-password" placeholder="Contraseña" />
+          </label>
+        </div>
+
+        <div class="login-actions">
+          <button id="loginBtn" class="btn primary">Ingresar al sistema</button>
+        </div>
+
+        <div class="login-note">
+          Ingresa tus credenciales para acceder al portal y sincronizar los registros de secadas.
+        </div>
+      </section>
     </div>
   </div>
 
@@ -208,6 +239,12 @@
             </div>
             <div class="chart-box">
               <canvas id="trendChart" width="700" height="280"></canvas>
+              <div class="chart-legend" aria-label="Leyenda de tendencia y paro">
+                <span class="legend-chip real">Secadas reales</span>
+                <span class="legend-chip trend">Línea de tendencia</span>
+                <span class="legend-chip meta">Meta diaria 6</span>
+                <span class="legend-chip stop">Paro automático: 12 h y pide causa</span>
+              </div>
             </div>
           </section>
         </div>
@@ -407,7 +444,19 @@
 
           <section class="card">
             <div class="card-head">
-              <h3>Paros detectados</h3>
+              <h3>Leyenda del paro</h3>
+              <span class="pill">Explicación operativa</span>
+            </div>
+            <div class="stack">
+              <div class="legend-item">Si una secadora aparece con <strong>0</strong> o no aparece en la carga del día, el sistema la marca como <strong>paro automático de 12 horas</strong>.</div>
+              <div class="legend-item">El paro queda <strong>pendiente de justificar</strong> hasta que se registre la causa real: mecánico, eléctrico, falta de carga, programado u otra observación.</div>
+              <div class="legend-item">Ejemplo: si solo vienen Secadora 1 y 3, la Secadora 2 se genera como paro automático 12h y se pide ingresar la causa.</div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Paros y justificación</h3>
               <span class="pill">Secadoras faltantes</span>
             </div>
             <div id="missingDryersList" class="stack"></div>
