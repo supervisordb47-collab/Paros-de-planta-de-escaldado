@@ -13,8 +13,7 @@
       "owner": "supervisordb47-collab",
       "repo": "Paros-de-planta-de-escaldado",
       "branch": "main",
-      "path": "portal-data.json",
-      "autoSync": true
+      "path": "portal-data.json"
     },
     "githubSync": {
       "enabled": true,
