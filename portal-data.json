@@ -56,5 +56,13 @@
       "role": "operador",
       "active": true
     }
+  },
+  "records": [],
+  "notifications": [],
+  "meta": {
+    "notificationState": {
+      "DAY": null,
+      "NIGHT": null
+    }
   }
 }
