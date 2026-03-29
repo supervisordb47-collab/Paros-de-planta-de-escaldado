@@ -2625,30 +2625,15 @@
       "shift": "Día",
       "dryer": "1",
       "secadas": 1,
-      "durationHours": 0,
+      "durationHours": "06",
       "durationMinutes": "00",
       "stopHours": 0,
       "stopType": "",
       "mainStop": "",
       "notes": "Carga masiva · Silo remojo: 5-6 · Humedad entrada: 20.5 · Temp entrada: 115 · Responsable carga: JOSE HERNANDEZ · Humedad salida: 13.0 · Temp salida: 118 · Silo descarga: 2 · Responsable descarga: JOSE HERNANDEZ · Entero: 95.12 · Materia prima: 78.2",
       "createdAt": "2026-03-05T03:42:23.000Z",
-      "updatedAt": "2026-03-29T16:30:23.159Z",
-      "source": "bulk",
-      "sourceRow": 71,
-      "loadAt": "2026-03-04T15:40:00.000Z",
-      "unloadAt": "2026-03-04T10:50:00.000Z",
-      "siloLoad": "5-6",
-      "humidityIn": "20.5",
-      "tempIn": "115",
-      "responsibleLoad": "JOSE HERNANDEZ",
-      "humidityOut": "13.0",
-      "tempOut": "118",
-      "siloOut": "2",
-      "responsibleOut": "JOSE HERNANDEZ",
-      "yieldHead": "95.12",
-      "yieldRaw": "78.2",
-      "sourceLabel": "Pega masiva",
-      "fingerprint": "COMP|2026-03-04|DÍA|1|1|2026-03-04T15:40:00.000Z|2026-03-04T10:50:00.000Z|0|00|0|||5-6|2|JOSE HERNANDEZ|JOSE HERNANDEZ|CARGA MASIVA · SILO REMOJO: 5-6 · HUMEDAD ENTRADA: 20.5 · TEMP ENTRADA: 115 · RESPONSABLE CARGA: JOSE HERNANDEZ · HUMEDAD SALIDA: 13.0 · TEMP SALIDA: 118 · SILO DESCARGA: 2 · RESPONSABLE DESCARGA: JOSE HERNANDEZ · ENTERO: 95.12 · MATERIA PRIMA: 78.2"
+      "updatedAt": "2026-03-29T17:22:21.062Z",
+      "fingerprint": "COMP|2026-03-04|DÍA|1|1|||6|00|0|||||||CARGA MASIVA · SILO REMOJO: 5-6 · HUMEDAD ENTRADA: 20.5 · TEMP ENTRADA: 115 · RESPONSABLE CARGA: JOSE HERNANDEZ · HUMEDAD SALIDA: 13.0 · TEMP SALIDA: 118 · SILO DESCARGA: 2 · RESPONSABLE DESCARGA: JOSE HERNANDEZ · ENTERO: 95.12 · MATERIA PRIMA: 78.2"
     },
     {
       "id": "rec_k2nfs0vr6j7c",
@@ -2817,6 +2802,16 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif_2vak12kc1czq",
+      "title": "Registro editado",
+      "message": "ADMIN actualizó un registro del turno Día.",
+      "type": "warning",
+      "scope": "record",
+      "createdAt": "2026-03-29T17:22:21.062Z",
+      "readBy": [],
+      "source": "system"
+    },
     {
       "id": "notif_gbzu4etw169b",
       "title": "Registro editado",
