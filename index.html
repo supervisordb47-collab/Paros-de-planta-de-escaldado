@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Secadas | Sistema Portable</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <div id="loginView" class="login-screen">
+    <div class="login-card login-shell">
+      <section class="login-hero">
+        <div class="brand">
+          <div class="brand-mark">S</div>
+          <div>
+            <h1 id="loginTitle">Portal de Secadas</h1>
+            <p>Sistema corporativo para control de secadas, paros, históricos, forecast y trazabilidad.</p>
+          </div>
+        </div>
+
+        <div class="login-highlights">
+          <div class="hero-metric">
+            <span>Histórico consolidado</span>
+            <strong>Mensual / semanal / diario</strong>
+          </div>
+          <div class="hero-metric">
+            <span>Sincronización</span>
+            <strong>GitHub + respaldo operativo</strong>
+          </div>
+          <div class="hero-metric">
+            <span>Alertas</span>
+            <strong>Paros automáticos y notificaciones</strong>
+          </div>
+          <div class="hero-metric">
+            <span>Analítica</span>
+            <strong>Tendencia, forecast y comparación</strong>
+          </div>
+        </div>
+
+        <div class="hero-note">
+          Diseñado para planta: lectura rápida, consolidado visible y control por usuario.
+        </div>
+      </section>
+
+      <section class="login-panel">
+        <div class="panel-kicker">Acceso seguro</div>
+        <div class="login-grid">
+          <label class="field">
+            <span>Usuario</span>
+            <input id="loginUser" type="text" autocomplete="username" placeholder="Escribe tu usuario" />
+          </label>
+          <label class="field">
+            <span>Contraseña</span>
+            <input id="loginPass" type="password" autocomplete="current-password" placeholder="Contraseña" />
+          </label>
+        </div>
+
+        <div class="login-actions">
+          <button id="loginBtn" class="btn primary">Ingresar al sistema</button>
+        </div>
+
+        <div class="login-note">
+          Ingresa tus credenciales para acceder al portal y sincronizar los registros de secadas.
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="appView" class="app hidden">
+    <aside class="sidebar">
+      <div class="side-brand">
+        <div class="side-mark">S</div>
+        <div>
+          <strong id="portalName">Portal Secadas</strong>
+          <p id="portalTagline">Operación, turnos y trazabilidad</p>
+        </div>
+      </div>
+
+      <div class="side-card user-card">
+        <div class="user-top">
+          <div class="avatar-wrap">
+            <div class="user-avatar" id="userAvatar">A</div>
+            <div>
+              <div class="user-name" id="userName">—</div>
+              <div class="user-role" id="userRole">—</div>
+            </div>
+          </div>
+          <span id="roleBadge" class="badge">—</span>
+        </div>
+        <div class="user-meta" id="userMeta">Sesión activa</div>
+        <div class="user-mini-stats">
+          <span id="userMiniLayout">Layout ejecutivo</span>
+          <span id="userMiniSync">Nube: pendiente</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-btn active" data-view="dashboardView">Dashboard</button>
+        <button class="nav-btn" data-view="recordsView">Registros</button>
+        <button class="nav-btn" data-view="notificationsView">Notificaciones</button>
+        <button class="nav-btn admin-only" data-view="usersView">Usuarios</button>
+        <button class="nav-btn admin-only" data-view="settingsView">Configuración</button>
+        <button class="nav-btn admin-only" data-view="backupView">Respaldo</button>
+      </nav>
+
+      <div class="side-card">
+        <div class="quick-title">Resumen rápido</div>
+        <div class="quick-grid">
+          <div class="mini-kpi"><span>Total</span><strong id="kpiTotal">0</strong></div>
+          <div class="mini-kpi"><span>Mes</span><strong id="kpiMonth">0</strong></div>
+          <div class="mini-kpi"><span>Cumpl.</span><strong id="kpiCompliance">0%</strong></div>
+          <div class="mini-kpi"><span>Alertas</span><strong id="kpiAlerts">0</strong></div>
+        </div>
+      </div>
+
+      <div class="side-actions">
+        <button id="logoutBtn" class="btn ghost">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow" id="topbarEyebrow">Sistema portable de secadas</div>
+          <h2 id="topbarTitle">Tablero ejecutivo</h2>
+          <p id="topbarText">Registros, notificaciones, gráficos y control por usuario.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="notif-wrap">
+            <button id="notifBell" class="bell" aria-label="Notificaciones">
+              <span>🔔</span>
+              <span id="notifCount" class="bell-count">0</span>
+            </button>
+            <div id="notifPanel" class="notif-panel hidden">
+              <div class="panel-head">
+                <strong>Notificaciones</strong>
+                <div class="panel-head-actions">
+                  <button id="markAllReadBtn" class="link-btn">Marcar todas</button>
+                  <button id="closeNotifBtn" class="link-btn">Cerrar</button>
+                </div>
+              </div>
+              <div id="notifList" class="notif-list"></div>
+            </div>
+          </div>
+          <button id="whatsappBtn" class="btn soft" aria-label="WhatsApp">💬 WhatsApp</button>
+          <button id="refreshBtn" class="btn soft">Actualizar</button>
+        </div>
+      </header>
+
+      <section id="dashboardView" class="view">
+        <div class="kpi-grid">
+          <article class="card kpi-card accent-a">
+            <span class="kpi-label">Total de secadas</span>
+            <strong id="dashTotal" class="kpi-value">0</strong>
+            <span class="kpi-sub">Acumulado general del portal</span>
+          </article>
+          <article class="card kpi-card accent-b">
+            <span class="kpi-label">Cumplimiento mensual</span>
+            <strong id="dashCompliance" class="kpi-value">0%</strong>
+            <span class="kpi-sub">Meta configurada por administración</span>
+          </article>
+          <article class="card kpi-card accent-c">
+            <span class="kpi-label">Turno con más secadas</span>
+            <strong id="dashBestShift" class="kpi-value">—</strong>
+            <span class="kpi-sub">Comparación día / noche</span>
+          </article>
+          <article class="card kpi-card accent-d">
+            <span class="kpi-label">Último registro</span>
+            <strong id="dashLastRecord" class="kpi-value">—</strong>
+            <span class="kpi-sub">Registro más reciente</span>
+          </article>
+        </div>
+
+        <div class="kpi-grid" style="margin-top:16px">
+          <article class="card mini-stat">
+            <span class="kpi-label">Secadas hoy</span>
+            <strong id="statToday" class="kpi-value">0</strong>
+            <span class="kpi-sub">Registros reales del día</span>
+          </article>
+          <article class="card mini-stat">
+            <span class="kpi-label">Secadas semana</span>
+            <strong id="statWeek" class="kpi-value">0</strong>
+            <span class="kpi-sub">Registros reales de la semana</span>
+          </article>
+          <article class="card mini-stat">
+            <span class="kpi-label">Secadas mes</span>
+            <strong id="statMonth" class="kpi-value">0</strong>
+            <span class="kpi-sub">Registros reales del mes</span>
+          </article>
+          <article class="card mini-stat">
+            <span class="kpi-label">Paros hoy</span>
+            <strong id="statStopsToday" class="kpi-value">0</strong>
+            <span class="kpi-sub">Secadoras sin registro</span>
+          </article>
+        </div>
+
+        <div class="three-col">
+          <section class="card">
+            <div class="card-head">
+              <h3>Comparación semanal</h3>
+              <span class="pill">Semana actual / pasada / antepasada</span>
+            </div>
+            <div id="weeklyComparisonPanel" class="stack"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Forecast semanal</h3>
+              <span class="pill">Tendencia y proyección</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="forecastChart" width="700" height="280"></canvas>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Consolidado por secadora</h3>
+              <span class="pill">Promedio y acumulado</span>
+            </div>
+            <div id="dryerSummaryPanel" class="stack"></div>
+          </section>
+        </div>
+
+        <div class="three-col dashboard-extra-grid">
+          <section class="card">
+            <div class="card-head">
+              <h3>Histórico interactivo</h3>
+              <span class="pill">Año / mes / semana</span>
+            </div>
+            <div class="row3">
+              <label class="field"><span>Año</span><select id="historyYear" class="big-select"><option value="">Todos</option></select></label>
+              <label class="field"><span>Mes</span><select id="historyMonth" class="big-select"><option value="">Todos</option></select></label>
+              <label class="field"><span>Semana</span><select id="historyWeek" class="big-select"><option value="">Todas</option></select></label>
+            </div>
+            <div id="historyDetailPanel" class="stack"></div>
+          </section>
+
+          <section class="card whatsapp-card">
+            <div class="card-head">
+              <h3>WhatsApp Center</h3>
+              <span class="pill">Mensajes rápidos</span>
+            </div>
+            <div id="whatsappCenterPanel" class="stack"></div>
+          </section>
+
+          <section class="card profile-card">
+            <div class="card-head">
+              <h3>Perfil corporativo</h3>
+              <span class="pill">Identidad visual</span>
+            </div>
+            <div id="profileSnapshotPanel" class="stack"></div>
+          </section>
+        </div>
+
+        <div class="two-col">
+          <section class="card">
+            <div class="card-head">
+              <h3>Secadas por turno</h3>
+              <span class="pill">Comparativo Día / Noche</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="shiftChart" width="700" height="280"></canvas>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Tendencia en tiempo real</h3>
+              <span class="pill">Últimos 14 días</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="trendChart" width="700" height="280"></canvas>
+              <div class="chart-legend" aria-label="Leyenda de tendencia y paro">
+                <span class="legend-chip real">Secadas reales</span>
+                <span class="legend-chip trend">Línea de tendencia</span>
+                <span class="legend-chip meta">Meta diaria 6</span>
+                <span class="legend-chip stop">Paro automático: 12 h y pide causa</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="three-col">
+          <section class="card">
+            <div class="card-head"><h3>Top 3 paros</h3><span class="pill">Más tiempo</span></div>
+            <div id="topStops" class="stack"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-head"><h3>Resumen mensual</h3><span class="pill">Meta y cumplimiento</span></div>
+            <div class="chart-box">
+              <canvas id="monthlyChart" width="700" height="280"></canvas>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head"><h3>Actividad reciente</h3><span class="pill">Eventos</span></div>
+            <div id="recentActivity" class="stack"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="recordsView" class="view hidden">
+        <div class="two-col form-layout">
+          <section class="card form-card">
+            <div class="card-head">
+              <h3>Nuevo registro</h3>
+              <span id="editModeBadge" class="pill hidden">Modo edición</span>
+            </div>
+
+            <div class="record-form">
+              <div class="row2">
+                <label class="field">
+                  <span>Fecha</span>
+                  <input id="recordDate" type="date" />
+                </label>
+                <label class="field">
+                  <span>Turno</span>
+                  <select id="recordShift" class="big-select">
+                    <option value="Día">Turno Día</option>
+                    <option value="Noche">Turno Noche</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="row2">
+                <label class="field">
+                  <span>Secadora</span>
+                  <select id="recordDryer" class="big-select">
+                    <option value="1">Secadora 1</option>
+                    <option value="2">Secadora 2</option>
+                    <option value="3">Secadora 3</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Secadas realizadas</span>
+                  <input id="recordSecadas" class="big-input" type="number" min="0" step="1" placeholder="0" />
+                </label>
+              </div>
+
+              <div id="durationBlock" class="block">
+                <div class="block-head">Tiempo promedio de secado</div>
+                <div class="row2">
+                  <label class="field">
+                    <span>Horas</span>
+                    <select id="durationHours" class="big-select"></select>
+                  </label>
+                  <label class="field">
+                    <span>Minutos</span>
+                    <select id="durationMinutes" class="big-select"></select>
+                  </label>
+                </div>
+              </div>
+
+              <div id="stopBlock" class="block">
+                <div class="block-head">Paro principal</div>
+                <div class="row2">
+                  <label class="field">
+                    <span>Horas de paro</span>
+                    <input id="stopHours" class="big-input" type="number" min="0" step="0.1" placeholder="0" />
+                  </label>
+                  <label class="field">
+                    <span>Tipo de paro</span>
+                    <select id="stopType" class="big-select">
+                      <option value="">Seleccione</option>
+                      <option value="mecanico">Mecánico</option>
+                      <option value="electrico">Eléctrico</option>
+                      <option value="motor">Motor</option>
+                      <option value="bomba">Bomba</option>
+                      <option value="carga">Falta de carga</option>
+                      <option value="programado">Programado</option>
+                      <option value="otro">Otro</option>
+                    </select>
+                  </label>
+                </div>
+                <label class="field">
+                  <span>Descripción del paro principal</span>
+                  <textarea id="mainStop" class="big-textarea" placeholder="Describe el paro principal con detalle..."></textarea>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Observaciones</span>
+                <textarea id="recordNotes" class="big-textarea" placeholder="Anota detalles, incidencias o recomendaciones..."></textarea>
+              </label>
+
+              <div class="form-actions">
+                <button id="saveRecordBtn" class="btn primary">Guardar registro</button>
+                <button id="clearRecordBtn" class="btn soft">Limpiar</button>
+                <button id="todayBtn" class="btn ghost">Hoy</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Filtros y control</h3>
+              <span class="pill">Edición / borrado</span>
+            </div>
+
+            <div class="filters">
+              <label class="field">
+                <span>Buscar</span>
+                <input id="searchRecords" class="big-input" type="search" placeholder="Usuario, turno, secadora, causa..." />
+              </label>
+              <div class="row2">
+                <label class="field">
+                  <span>Fecha</span>
+                  <input id="filterDate" type="date" />
+                </label>
+                <label class="field">
+                  <span>Turno</span>
+                  <select id="filterShift" class="big-select">
+                    <option value="">Todos</option>
+                    <option value="Día">Día</option>
+                    <option value="Noche">Noche</option>
+                  </select>
+                </label>
+              </div>
+              <div class="row2">
+                <label class="field">
+                  <span>Usuario</span>
+                  <select id="filterUser" class="big-select"></select>
+                </label>
+                <label class="field">
+                  <span>Estado</span>
+                  <select id="filterStatus" class="big-select">
+                    <option value="">Todos</option>
+                    <option value="ok">Con secadas</option>
+                    <option value="stop">Paro total</option>
+                  </select>
+                </label>
+              </div>
+              <div class="row3">
+                <label class="field">
+                  <span>Año</span>
+                  <select id="filterYear" class="big-select"><option value="">Todos</option></select>
+                </label>
+                <label class="field">
+                  <span>Mes</span>
+                  <select id="filterMonth" class="big-select"><option value="">Todos</option></select>
+                </label>
+                <label class="field">
+                  <span>Semana</span>
+                  <select id="filterWeek" class="big-select"><option value="">Todas</option></select>
+                </label>
+              </div>
+              <div class="row-actions table-actions">
+                <button id="selectVisibleBtn" class="btn soft">Seleccionar visibles</button>
+                <button id="clearSelectionBtn" class="btn ghost">Limpiar selección</button>
+                <button id="deleteSelectedBtn" class="btn danger">Borrar seleccionados</button>
+                <button id="deleteImportedBtn" class="btn danger soft">Borrar carga masiva</button>
+              </div>
+              <div id="historySummary" class="summary-grid"></div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Fecha</th>
+                    <th>Turno</th>
+                    <th>Secadora</th>
+                    <th>Secadas</th>
+                    <th>Duración</th>
+                    <th>Paro</th>
+                    <th>Usuario</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="recordsBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <div class="three-col" style="margin-top:16px">
+          <section class="card">
+            <div class="card-head">
+              <h3>Carga masiva desde Excel</h3>
+              <span class="pill">Pega tabulado</span>
+            </div>
+            <div class="record-form">
+              <label class="field">
+                <span>Pega aquí los datos</span>
+                <textarea id="bulkPasteInput" class="big-textarea" placeholder="Pega aquí las filas copiadas desde Excel o Google Sheets. La primera fila puede traer encabezados."></textarea>
+              </label>
+              <div class="row-actions">
+                <button id="bulkPreviewBtn" class="btn soft">Previsualizar</button>
+                <button id="bulkImportBtn" class="btn primary">Importar registros</button>
+                <button id="bulkClearBtn" class="btn ghost">Limpiar</button>
+              </div>
+              <div id="bulkImportInfo" class="empty">Listo para pegar datos.</div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Leyenda del paro</h3>
+              <span class="pill">Explicación operativa</span>
+            </div>
+            <div class="stack">
+              <div class="legend-item">Si una secadora aparece con <strong>0</strong> o no aparece en la carga del día, el sistema la marca como <strong>paro automático de 12 horas</strong>.</div>
+              <div class="legend-item">El paro queda <strong>pendiente de justificar</strong> hasta que se registre la causa real: mecánico, eléctrico, falta de carga, programado u otra observación.</div>
+              <div class="legend-item">Ejemplo: si solo vienen Secadora 1 y 3, la Secadora 2 se genera como paro automático 12h y se pide ingresar la causa.</div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Paros y justificación</h3>
+              <span class="pill">Secadoras faltantes</span>
+            </div>
+            <div id="missingDryersList" class="stack"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Resumen rápido</h3>
+              <span class="pill">Real / paro</span>
+            </div>
+            <div id="quickPeriodStats" class="stack"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="notificationsView" class="view hidden">
+        <section class="card">
+          <div class="card-head">
+            <h3>Centro de notificaciones</h3>
+            <div class="row-actions">
+              <button id="checkAlertsBtn" class="btn soft">Revisar alertas</button>
+              <button id="clearNotifsBtn" class="btn ghost">Vaciar leídas</button>
+            </div>
+          </div>
+          <div id="notificationFeed" class="feed"></div>
+        </section>
+      </section>
+
+      <section id="usersView" class="view hidden admin-only-view">
+        <div class="two-col">
+          <section class="card">
+            <div class="card-head">
+              <h3>Crear usuario</h3>
+              <span class="pill">Solo ADMIN</span>
+            </div>
+            <div class="record-form">
+              <div class="row2">
+                <label class="field">
+                  <span>Usuario</span>
+                  <input id="newUserName" class="big-input" placeholder="usuario" />
+                </label>
+                <label class="field">
+                  <span>Contraseña</span>
+                  <input id="newUserPass" class="big-input" type="password" placeholder="contraseña" />
+                </label>
+              </div>
+              <div class="row2">
+                <label class="field">
+                  <span>Nombre completo</span>
+                  <input id="newUserFullName" class="big-input" placeholder="Nombre completo" />
+                </label>
+                <label class="field">
+                  <span>Rol</span>
+                  <select id="newUserRole" class="big-select">
+                    <option value="operador">Operador</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                </label>
+              </div>
+              <div class="row2">
+                <label class="field">
+                  <span>Estado</span>
+                  <select id="newUserActive" class="big-select">
+                    <option value="true">Activo</option>
+                    <option value="false">Deshabilitado</option>
+                  </select>
+                </label>
+                <div class="field">
+                  <span>&nbsp;</span>
+                  <button id="createUserBtn" class="btn primary">Crear usuario</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h3>Usuarios existentes</h3>
+              <span class="pill" id="userCountPill">0</span>
+            </div>
+            <div id="usersList" class="stack"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="settingsView" class="view hidden admin-only-view">
+        <section class="card">
+          <div class="card-head">
+            <h3>Configuraciones del sistema</h3>
+            <span class="pill">Editable por admin</span>
+          </div>
+
+          <div class="two-col">
+            <div class="record-form">
+              <label class="field">
+                <span>Nombre del portal</span>
+                <input id="settingPortalName" class="big-input" />
+              </label>
+              <label class="field">
+                <span>Leyenda inferior</span>
+                <input id="settingPortalTagline" class="big-input" />
+              </label>
+              <div class="row2">
+                <label class="field">
+                  <span>Meta diaria</span>
+                  <input id="settingDailyTarget" class="big-input" type="number" min="1" step="1" />
+                </label>
+                <label class="field">
+                  <span>Meta semanal</span>
+                  <input id="settingWeeklyTarget" class="big-input" type="number" min="1" step="1" />
+                </label>
+              </div>
+              <div class="row2">
+                <label class="field">
+                  <span>Meta mensual</span>
+                  <input id="settingMonthlyTarget" class="big-input" type="number" min="1" step="1" />
+                </label>
+                <label class="field">
+                  <span>Horas para aviso sin ingreso</span>
+                  <input id="settingAlertHours" class="big-input" type="number" min="1" step="1" />
+                </label>
+              </div>
+              <div class="row2">
+                <label class="field">
+                  <span>Color principal</span>
+                  <select id="settingTheme" class="big-select">
+                    <option value="blue">Azul corporativo</option>
+                    <option value="green">Verde industrial</option>
+                    <option value="amber">Ámbar técnico</option>
+                    <option value="violet">Violeta premium</option>
+                  </select>
+                </label>
+              </div>
+              <div class="row2">
+                <label class="field">
+                  <span>Número WhatsApp</span>
+                  <input id="settingWhatsappNumber" class="big-input" placeholder="Ej. 50499999999" />
+                </label>
+                <label class="field">
+                  <span>Mensaje WhatsApp</span>
+                  <input id="settingWhatsappMessage" class="big-input" placeholder="Mensaje predeterminado" />
+                </label>
+              </div>
+              <div class="card inner-card">
+                <div class="soft-title">Sincronización GitHub</div>
+                <div class="row2">
+                  <label class="field"><span>Owner</span><input id="githubOwner" class="big-input" placeholder="tuusuario" /></label>
+                  <label class="field"><span>Repo</span><input id="githubRepo" class="big-input" placeholder="portal-secadas" /></label>
+                </div>
+                <div class="row2">
+                  <label class="field"><span>Branch</span><input id="githubBranch" class="big-input" placeholder="main" /></label>
+                  <label class="field"><span>Archivo JSON</span><input id="githubPath" class="big-input" placeholder="portal-data.json" /></label>
+                </div>
+                <label class="field">
+                  <span>Token GitHub (sesión)</span>
+                  <input id="githubToken" class="big-input" type="password" placeholder="github_pat_..." />
+                </label>
+                <div class="row-actions">
+                  <button id="saveGithubBtn" class="btn soft">Guardar nube</button>
+                  <button id="syncGithubBtn" class="btn primary">Sincronizar ahora</button>
+                </div>
+                <div id="githubStatus" class="empty">Sin sincronización configurada.</div>
+              </div>
+              <div class="form-actions">
+                <button id="saveSettingsBtn" class="btn primary">Guardar configuración</button>
+                <button id="resetSettingsBtn" class="btn soft">Restaurar ajustes</button>
+              </div>
+            </div>
+
+            <div class="card inner-card">
+              <div class="soft-title">Perfil corporativo</div>
+              <div class="profile-editor">
+                <div class="profile-preview">
+                  <img id="profileAvatarPreview" alt="Foto de perfil" />
+                  <div>
+                    <strong>Foto de perfil</strong>
+                    <p>Personaliza el avatar visible en el panel lateral y en la vista ejecutiva.</p>
+                  </div>
+                </div>
+                <label class="field">
+                  <span>Cambiar foto</span>
+                  <input id="profileAvatarInput" class="big-input" type="file" accept="image/*" />
+                </label>
+                <div class="row2">
+                  <label class="field">
+                    <span>Modo de layout</span>
+                    <select id="settingLayout" class="big-select">
+                      <option value="executive">Ejecutivo</option>
+                      <option value="compact">Compacto</option>
+                      <option value="wide">Amplio</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Fuente del sistema</span>
+                    <select id="settingFont" class="big-select">
+                      <option value="inter">Inter</option>
+                      <option value="plex">IBM Plex Sans</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="row-actions">
+                  <button id="clearAvatarBtn" class="btn ghost" type="button">Quitar foto</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card inner-card">
+              <div class="soft-title">Acceso y privilegios</div>
+              <ul class="list">
+                <li>ADMIN puede crear, editar, deshabilitar y eliminar usuarios.</li>
+                <li>ADMIN puede editar y eliminar todos los registros.</li>
+                <li>Usuarios normales trabajan sobre sus propios registros.</li>
+                <li>Las notificaciones se guardan por sesión y se exportan con el respaldo.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="backupView" class="view hidden admin-only-view">
+        <section class="card">
+          <div class="card-head">
+            <h3>Respaldo portable</h3>
+            <span class="pill">JSON</span>
+          </div>
+          <div class="backup-box">
+            <div class="backup-card">
+              <h4>Exportar todo</h4>
+              <p>Descarga usuarios, registros, notificaciones y configuración en un solo archivo.</p>
+              <button id="exportJsonBtn" class="btn primary">Exportar JSON</button>
+            </div>
+            <div class="backup-card">
+              <h4>Importar respaldo</h4>
+              <p>Sube un JSON compatible para restaurar todo el sistema.</p>
+              <input id="importJsonInput" type="file" accept="application/json" hidden />
+              <button id="importJsonBtn" class="btn soft">Importar JSON</button>
+            </div>
+            <div class="backup-card">
+              <h4>Exportar CSV</h4>
+              <p>Genera un CSV de registros para revisar en Excel o similar.</p>
+              <button id="exportCsvBtn" class="btn soft">Exportar CSV</button>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -4,6 +4,7 @@
     "portalTagline": "Operación, turnos y trazabilidad",
     "dailyTarget": 6,
     "monthlyTarget": 180,
+    "weeklyTarget": 42,
     "alertHours": 12,
     "totalDryers": 3,
     "theme": "blue",
