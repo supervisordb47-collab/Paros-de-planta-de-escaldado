@@ -3124,7 +3124,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:06:48.067Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3134,7 +3136,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:06:34.779Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3144,7 +3148,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:06:21.757Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3154,7 +3160,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:06:09.240Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3164,7 +3172,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:05:54.200Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3174,7 +3184,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:05:25.775Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3184,7 +3196,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:05:12.318Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3194,7 +3208,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:04:40.819Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3204,7 +3220,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:04:25.190Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3214,7 +3232,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:04:13.184Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3224,7 +3244,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:03:49.945Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3234,7 +3256,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:03:06.965Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3244,7 +3268,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:02:10.046Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3254,7 +3280,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T16:35:38.138Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     }
   ],
