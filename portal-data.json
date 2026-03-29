@@ -2010,30 +2010,15 @@
       "shift": "Noche",
       "dryer": "3",
       "secadas": 1,
-      "durationHours": 0,
+      "durationHours": "08",
       "durationMinutes": "00",
       "stopHours": 0,
       "stopType": "",
       "mainStop": "",
       "notes": "Carga masiva · Silo remojo: 1-2 · Humedad entrada: 20.6 · Temp entrada: 131 · Responsable carga: SELVIN FIGUEROA · Humedad salida: 13.1 · Temp salida: 131 · Silo descarga: 3 · Responsable descarga: SELVIN FIGUEROA · Entero: 94.46 · Materia prima: 75.9",
       "createdAt": "2026-03-13T04:25:00.000Z",
-      "updatedAt": "2026-03-29T16:30:23.159Z",
-      "source": "bulk",
-      "sourceRow": 51,
-      "loadAt": "2026-03-13T04:24:00.000Z",
-      "unloadAt": "2026-03-12T09:13:00.000Z",
-      "siloLoad": "1-2",
-      "humidityIn": "20.6",
-      "tempIn": "131",
-      "responsibleLoad": "SELVIN FIGUEROA",
-      "humidityOut": "13.1",
-      "tempOut": "131",
-      "siloOut": "3",
-      "responsibleOut": "SELVIN FIGUEROA",
-      "yieldHead": "94.46",
-      "yieldRaw": "75.9",
-      "sourceLabel": "Pega masiva",
-      "fingerprint": "COMP|2026-03-12|NOCHE|3|1|2026-03-13T04:24:00.000Z|2026-03-12T09:13:00.000Z|0|00|0|||1-2|3|SELVIN FIGUEROA|SELVIN FIGUEROA|CARGA MASIVA · SILO REMOJO: 1-2 · HUMEDAD ENTRADA: 20.6 · TEMP ENTRADA: 131 · RESPONSABLE CARGA: SELVIN FIGUEROA · HUMEDAD SALIDA: 13.1 · TEMP SALIDA: 131 · SILO DESCARGA: 3 · RESPONSABLE DESCARGA: SELVIN FIGUEROA · ENTERO: 94.46 · MATERIA PRIMA: 75.9"
+      "updatedAt": "2026-03-29T17:21:50.599Z",
+      "fingerprint": "COMP|2026-03-12|NOCHE|3|1|||8|00|0|||||||CARGA MASIVA · SILO REMOJO: 1-2 · HUMEDAD ENTRADA: 20.6 · TEMP ENTRADA: 131 · RESPONSABLE CARGA: SELVIN FIGUEROA · HUMEDAD SALIDA: 13.1 · TEMP SALIDA: 131 · SILO DESCARGA: 3 · RESPONSABLE DESCARGA: SELVIN FIGUEROA · ENTERO: 94.46 · MATERIA PRIMA: 75.9"
     },
     {
       "id": "rec_hu313o876j7b",
@@ -2862,6 +2847,16 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif_aaqx1mzy0phj",
+      "title": "Registro editado",
+      "message": "ADMIN actualizó un registro del turno Noche.",
+      "type": "warning",
+      "scope": "record",
+      "createdAt": "2026-03-29T17:21:50.599Z",
+      "readBy": [],
+      "source": "system"
+    },
     {
       "id": "notif_ni4n23l30jfw",
       "title": "Registro editado",
