@@ -1104,30 +1104,15 @@
       "shift": "Noche",
       "dryer": "3",
       "secadas": 1,
-      "durationHours": 0,
+      "durationHours": "06",
       "durationMinutes": "00",
       "stopHours": 0,
       "stopType": "",
       "mainStop": "",
       "notes": "Carga masiva · Silo remojo: 6-1 · Humedad entrada: 20.7 · Temp entrada: 130 · Responsable carga: JOSE HERNANDEZ · Humedad salida: 13.2 · Temp salida: 125 · Silo descarga: 1 · Responsable descarga: JOSE HERNANDEZ · Entero: 92.04 · Materia prima: 78.0",
       "createdAt": "2026-03-24T01:42:06.000Z",
-      "updatedAt": "2026-03-29T16:30:23.156Z",
-      "source": "bulk",
-      "sourceRow": 19,
-      "loadAt": "2026-03-24T01:35:00.000Z",
-      "unloadAt": "2026-03-23T06:15:00.000Z",
-      "siloLoad": "6-1",
-      "humidityIn": "20.7",
-      "tempIn": "130",
-      "responsibleLoad": "JOSE HERNANDEZ",
-      "humidityOut": "13.2",
-      "tempOut": "125",
-      "siloOut": "1",
-      "responsibleOut": "JOSE HERNANDEZ",
-      "yieldHead": "92.04",
-      "yieldRaw": "78.0",
-      "sourceLabel": "Pega masiva",
-      "fingerprint": "COMP|2026-03-23|NOCHE|3|1|2026-03-24T01:35:00.000Z|2026-03-23T06:15:00.000Z|0|00|0|||6-1|1|JOSE HERNANDEZ|JOSE HERNANDEZ|CARGA MASIVA · SILO REMOJO: 6-1 · HUMEDAD ENTRADA: 20.7 · TEMP ENTRADA: 130 · RESPONSABLE CARGA: JOSE HERNANDEZ · HUMEDAD SALIDA: 13.2 · TEMP SALIDA: 125 · SILO DESCARGA: 1 · RESPONSABLE DESCARGA: JOSE HERNANDEZ · ENTERO: 92.04 · MATERIA PRIMA: 78.0"
+      "updatedAt": "2026-03-29T17:20:18.455Z",
+      "fingerprint": "COMP|2026-03-23|NOCHE|3|1|||6|00|0|||||||CARGA MASIVA · SILO REMOJO: 6-1 · HUMEDAD ENTRADA: 20.7 · TEMP ENTRADA: 130 · RESPONSABLE CARGA: JOSE HERNANDEZ · HUMEDAD SALIDA: 13.2 · TEMP SALIDA: 125 · SILO DESCARGA: 1 · RESPONSABLE DESCARGA: JOSE HERNANDEZ · ENTERO: 92.04 · MATERIA PRIMA: 78.0"
     },
     {
       "id": "rec_d3z7qzwd6j78",
@@ -3012,6 +2997,16 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif_9bjotqntyqdz",
+      "title": "Registro editado",
+      "message": "ADMIN actualizó un registro del turno Noche.",
+      "type": "warning",
+      "scope": "record",
+      "createdAt": "2026-03-29T17:20:18.455Z",
+      "readBy": [],
+      "source": "system"
+    },
     {
       "id": "notif_888620j2yk0a",
       "title": "Registro editado",
