@@ -10,6 +10,9 @@
     "theme": "blue",
     "whatsappNumber": "+50488305122",
     "whatsappMessage": "Hola, necesito apoyo con el portal de secadas.",
+    "profileAvatar": "",
+    "layoutMode": "executive",
+    "fontFamily": "inter",
     "github": {
       "owner": "supervisordb47-collab",
       "repo": "Paros-de-planta-de-escaldado",
