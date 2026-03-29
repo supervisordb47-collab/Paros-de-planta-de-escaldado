@@ -3094,7 +3094,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:13:47.125Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3104,7 +3106,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:13:34.097Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3114,7 +3118,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:13:16.617Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3124,7 +3130,9 @@
       "type": "danger",
       "scope": "record",
       "createdAt": "2026-03-29T17:13:04.411Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3134,7 +3142,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:12:34.944Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3144,7 +3154,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:11:03.172Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3154,7 +3166,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:10:44.340Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3164,7 +3178,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:10:30.776Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3174,7 +3190,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:10:00.742Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
@@ -3184,7 +3202,9 @@
       "type": "warning",
       "scope": "record",
       "createdAt": "2026-03-29T17:09:52.543Z",
-      "readBy": [],
+      "readBy": [
+        "ADMIN"
+      ],
       "source": "system"
     },
     {
