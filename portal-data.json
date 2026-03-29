@@ -47,7 +47,7 @@
       "fullName": "Gadiel",
       "password": "gadiel",
       "role": "operador",
-      "active": true
+      "active": false
     },
     "JOSE": {
       "username": "JOSE",
