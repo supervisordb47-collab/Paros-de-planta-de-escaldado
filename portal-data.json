@@ -1809,30 +1809,15 @@
       "shift": "Día",
       "dryer": "2",
       "secadas": 1,
-      "durationHours": 0,
-      "durationMinutes": "00",
+      "durationHours": "07",
+      "durationMinutes": "15",
       "stopHours": 0,
       "stopType": "",
       "mainStop": "",
       "notes": "Carga masiva · Silo remojo: 3-4 · Humedad entrada: 20.2 · Temp entrada: 120 · Responsable carga: GADIEL OCHOA · Humedad salida: 13.0 · Temp salida: 125 · Silo descarga: 1 · Responsable descarga: SELVIN FIGUEROA · Entero: 94.28 · Materia prima: 75.2",
       "createdAt": "2026-03-14T22:38:16.000Z",
-      "updatedAt": "2026-03-29T16:30:23.159Z",
-      "source": "bulk",
-      "sourceRow": 44,
-      "loadAt": "2026-03-14T22:30:00.000Z",
-      "unloadAt": "2026-03-14T07:20:00.000Z",
-      "siloLoad": "3-4",
-      "humidityIn": "20.2",
-      "tempIn": "120",
-      "responsibleLoad": "GADIEL OCHOA",
-      "humidityOut": "13.0",
-      "tempOut": "125",
-      "siloOut": "1",
-      "responsibleOut": "SELVIN FIGUEROA",
-      "yieldHead": "94.28",
-      "yieldRaw": "75.2",
-      "sourceLabel": "Pega masiva",
-      "fingerprint": "COMP|2026-03-14|DÍA|2|1|2026-03-14T22:30:00.000Z|2026-03-14T07:20:00.000Z|0|00|0|||3-4|1|GADIEL OCHOA|SELVIN FIGUEROA|CARGA MASIVA · SILO REMOJO: 3-4 · HUMEDAD ENTRADA: 20.2 · TEMP ENTRADA: 120 · RESPONSABLE CARGA: GADIEL OCHOA · HUMEDAD SALIDA: 13.0 · TEMP SALIDA: 125 · SILO DESCARGA: 1 · RESPONSABLE DESCARGA: SELVIN FIGUEROA · ENTERO: 94.28 · MATERIA PRIMA: 75.2"
+      "updatedAt": "2026-03-29T17:21:32.235Z",
+      "fingerprint": "COMP|2026-03-14|DÍA|2|1|||7|15|0|||||||CARGA MASIVA · SILO REMOJO: 3-4 · HUMEDAD ENTRADA: 20.2 · TEMP ENTRADA: 120 · RESPONSABLE CARGA: GADIEL OCHOA · HUMEDAD SALIDA: 13.0 · TEMP SALIDA: 125 · SILO DESCARGA: 1 · RESPONSABLE DESCARGA: SELVIN FIGUEROA · ENTERO: 94.28 · MATERIA PRIMA: 75.2"
     },
     {
       "id": "rec_tr70ckqb6j7b",
@@ -2892,6 +2877,16 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif_t5qor5j50bbf",
+      "title": "Registro editado",
+      "message": "ADMIN actualizó un registro del turno Día.",
+      "type": "warning",
+      "scope": "record",
+      "createdAt": "2026-03-29T17:21:32.235Z",
+      "readBy": [],
+      "source": "system"
+    },
     {
       "id": "notif_xcsnw60503u1",
       "title": "Registro editado",
