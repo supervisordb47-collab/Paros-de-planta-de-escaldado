@@ -54,7 +54,7 @@
       "fullName": "Jose",
       "password": "jose",
       "role": "operador",
-      "active": true
+      "active": false
     }
   },
   "records": [
