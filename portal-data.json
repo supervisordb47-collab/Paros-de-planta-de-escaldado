@@ -1659,30 +1659,15 @@
       "shift": "Día",
       "dryer": "3",
       "secadas": 1,
-      "durationHours": 0,
-      "durationMinutes": "00",
+      "durationHours": "06",
+      "durationMinutes": "15",
       "stopHours": 0,
       "stopType": "",
       "mainStop": "",
       "notes": "Carga masiva · Silo remojo: 2-3 · Humedad entrada: 20.2 · Temp entrada: 132 · Responsable carga: GADIEL OCHOA · Humedad salida: 13.1 · Temp salida: 36 · Silo descarga: 4 · Responsable descarga: GADIEL OCHOA · Entero: 87.57 · Materia prima: 75.3",
       "createdAt": "2026-03-16T21:07:56.000Z",
-      "updatedAt": "2026-03-29T16:30:23.159Z",
-      "source": "bulk",
-      "sourceRow": 39,
-      "loadAt": "2026-03-16T21:00:00.000Z",
-      "unloadAt": "2026-03-16T15:50:00.000Z",
-      "siloLoad": "2-3",
-      "humidityIn": "20.2",
-      "tempIn": "132",
-      "responsibleLoad": "GADIEL OCHOA",
-      "humidityOut": "13.1",
-      "tempOut": "36",
-      "siloOut": "4",
-      "responsibleOut": "GADIEL OCHOA",
-      "yieldHead": "87.57",
-      "yieldRaw": "75.3",
-      "sourceLabel": "Pega masiva",
-      "fingerprint": "COMP|2026-03-16|DÍA|3|1|2026-03-16T21:00:00.000Z|2026-03-16T15:50:00.000Z|0|00|0|||2-3|4|GADIEL OCHOA|GADIEL OCHOA|CARGA MASIVA · SILO REMOJO: 2-3 · HUMEDAD ENTRADA: 20.2 · TEMP ENTRADA: 132 · RESPONSABLE CARGA: GADIEL OCHOA · HUMEDAD SALIDA: 13.1 · TEMP SALIDA: 36 · SILO DESCARGA: 4 · RESPONSABLE DESCARGA: GADIEL OCHOA · ENTERO: 87.57 · MATERIA PRIMA: 75.3"
+      "updatedAt": "2026-03-29T17:21:22.537Z",
+      "fingerprint": "COMP|2026-03-16|DÍA|3|1|||6|15|0|||||||CARGA MASIVA · SILO REMOJO: 2-3 · HUMEDAD ENTRADA: 20.2 · TEMP ENTRADA: 132 · RESPONSABLE CARGA: GADIEL OCHOA · HUMEDAD SALIDA: 13.1 · TEMP SALIDA: 36 · SILO DESCARGA: 4 · RESPONSABLE DESCARGA: GADIEL OCHOA · ENTERO: 87.57 · MATERIA PRIMA: 75.3"
     },
     {
       "id": "rec_8kfh71zx6j7b",
@@ -2907,6 +2892,16 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif_xcsnw60503u1",
+      "title": "Registro editado",
+      "message": "ADMIN actualizó un registro del turno Día.",
+      "type": "warning",
+      "scope": "record",
+      "createdAt": "2026-03-29T17:21:22.537Z",
+      "readBy": [],
+      "source": "system"
+    },
     {
       "id": "notif_fsorjbqxzw5z",
       "title": "Registro editado",
