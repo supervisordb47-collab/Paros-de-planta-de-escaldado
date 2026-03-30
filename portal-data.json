@@ -3423,8 +3423,8 @@
   ],
   "meta": {
     "notificationState": {
-      "DAY": "rec_k50ae829msij_12",
-      "NIGHT": "rec_9ufn8uhh6j77_12"
+      "DAY": null,
+      "NIGHT": null
     }
   }
 }
