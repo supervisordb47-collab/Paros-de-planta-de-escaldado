@@ -59,6 +59,24 @@
   },
   "records": [
     {
+      "id": "rec_pnndwyctm97s",
+      "user": "ADMIN",
+      "fullName": "Administrador",
+      "date": "2026-03-28",
+      "shift": "Día",
+      "dryer": "2",
+      "secadas": 1,
+      "durationHours": "07",
+      "durationMinutes": "00",
+      "stopHours": 0,
+      "stopType": "",
+      "mainStop": "",
+      "notes": "",
+      "createdAt": "2026-03-30T13:42:19.432Z",
+      "updatedAt": "2026-03-30T13:42:19.432Z",
+      "fingerprint": "COMP|2026-03-28|DÍA|2|1|||7|00|0|||||||"
+    },
+    {
       "id": "rec_1nv5vqoalga0",
       "user": "ADMIN",
       "fullName": "Administrador",
@@ -2790,6 +2808,16 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif_tx6td3c1m97s",
+      "title": "Nuevo registro",
+      "message": "Administrador registró 1 secadas en turno Día (2026-03-28).",
+      "type": "success",
+      "scope": "record",
+      "createdAt": "2026-03-30T13:42:19.432Z",
+      "readBy": [],
+      "source": "system"
+    },
     {
       "id": "notif_rxqgjjb9lga1",
       "title": "Nuevo registro",
