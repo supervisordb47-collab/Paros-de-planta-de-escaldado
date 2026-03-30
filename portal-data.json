@@ -59,6 +59,24 @@
   },
   "records": [
     {
+      "id": "rec_1nv5vqoalga0",
+      "user": "ADMIN",
+      "fullName": "Administrador",
+      "date": "2026-03-29",
+      "shift": "Noche",
+      "dryer": "2",
+      "secadas": 1,
+      "durationHours": "08",
+      "durationMinutes": "00",
+      "stopHours": 0,
+      "stopType": "",
+      "mainStop": "",
+      "notes": "",
+      "createdAt": "2026-03-30T13:41:41.928Z",
+      "updatedAt": "2026-03-30T13:41:41.928Z",
+      "fingerprint": "COMP|2026-03-29|NOCHE|2|1|||8|00|0|||||||"
+    },
+    {
       "id": "rec_k50ae829msij",
       "user": "ADMIN",
       "fullName": "Administrador",
@@ -2772,6 +2790,16 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif_rxqgjjb9lga1",
+      "title": "Nuevo registro",
+      "message": "Administrador registró 1 secadas en turno Noche (2026-03-29).",
+      "type": "success",
+      "scope": "record",
+      "createdAt": "2026-03-30T13:41:41.929Z",
+      "readBy": [],
+      "source": "system"
+    },
     {
       "id": "notif_xctxzi8lkvks",
       "title": "Sin ingreso en turno Día",
