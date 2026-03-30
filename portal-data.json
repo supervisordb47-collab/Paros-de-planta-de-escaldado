@@ -2773,6 +2773,16 @@
   ],
   "notifications": [
     {
+      "id": "notif_xctxzi8lkvks",
+      "title": "Sin ingreso en turno Día",
+      "message": "Han pasado más de 12 horas desde el último registro del turno Día.",
+      "type": "warning",
+      "scope": "shift",
+      "createdAt": "2026-03-30T13:41:15.100Z",
+      "readBy": [],
+      "source": "system"
+    },
+    {
       "id": "notif_otpx7pyemsij",
       "title": "Nuevo registro",
       "message": "Administrador registró 1 secadas en turno Día (2026-03-29).",
@@ -3357,7 +3367,7 @@
   ],
   "meta": {
     "notificationState": {
-      "DAY": null,
+      "DAY": "rec_k50ae829msij_12",
       "NIGHT": "rec_9ufn8uhh6j77_12"
     }
   }
